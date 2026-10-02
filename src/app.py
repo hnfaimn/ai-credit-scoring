@@ -6,6 +6,24 @@ import joblib
 import shap
 import warnings
 warnings.filterwarnings("ignore")
+import threading
+import urllib.request
+
+def keep_alive():
+    """Ping the server every 14 minutes to prevent Render from sleeping."""
+    import time
+    while True:
+        time.sleep(14 * 60)  # 14 minutes
+        try:
+            urllib.request.urlopen(
+                "https://ai-credit-scoring.onrender.com/health"
+            )
+            print("✅ Keep-alive ping sent")
+        except Exception as e:
+            print(f"⚠️ Keep-alive failed: {e}")
+
+# Start keep-alive thread
+threading.Thread(target=keep_alive, daemon=True).start()
 
 app = Flask(__name__)
 CORS(app)
