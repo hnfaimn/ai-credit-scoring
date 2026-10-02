@@ -12,8 +12,10 @@ CORS(app)
 
 # ── Load models ──────────────────────────────────────────────────────────
 print("Loading models...")
-xgb_model = joblib.load("../models/xgb_model.pkl")
-scaler     = joblib.load("../models/scaler.pkl")
+import os
+BASE_DIR  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+xgb_model = joblib.load(os.path.join(BASE_DIR, "models", "xgb_model.pkl"))
+scaler     = joblib.load(os.path.join(BASE_DIR, "models", "scaler.pkl"))
 explainer  = shap.TreeExplainer(xgb_model)
 print("✅ Models loaded!")
 
