@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import "./App.css";
 
-const API = "https://ai-credit-scoring.onrender.com";
+const API = "https://ai-credit-scoring-gurz.onrender.com";
 
 const INITIAL_FORM = {
   age: 30,
