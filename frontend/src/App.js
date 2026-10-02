@@ -136,8 +136,16 @@ export default function App() {
     }
     setLoading(true); setError(null); setResult(null);
     setSimResult(null); setFieldErrors({}); setSavedId(null);
+
+   // Wake up Render first
     try {
-      const res = await axios.post(`${API}/explain`, form);
+      await axios.get(`${API}/health`, { timeout: 60000 });
+    } catch {
+    // ignore, just waking up
+    }
+
+    try {
+      const res = await axios.post(`${API}/explain`, form, { timeout: 60000 });
       setResult(res.data);
       const id = await saveAssessment(form, res.data);
       setSavedId(id);
@@ -159,7 +167,7 @@ export default function App() {
         ...form,
         feature_to_change: simFeature,
         new_value: simValue
-      });
+      }, { timeout: 60000 });
       setSimResult(res.data);
     } catch {
       setError("Simulation failed — make sure Flask is running.");
@@ -707,6 +715,9 @@ export default function App() {
             <div className="card placeholder">
               <div className="placeholder-icon spinning">⏳</div>
               <p>Analysing your profile, please wait...</p>
+              <p className="section-hint" style={{ marginTop: 8 }}>
+                First request may take up to 60 seconds to wake the server.
+              </p>
             </div>
           )}
 
