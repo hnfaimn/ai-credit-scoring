@@ -47,7 +47,7 @@ def load_models():
 
 # ── Feature labels ───────────────────────────────────────────────────────
 FEATURE_LABELS = {
-    "Checking account"  : "checking account status",
+    "Checking account"  : "current account & repayment behaviour",
     "Duration"          : "loan duration",
     "Credit amount"     : "credit amount requested",
     "Saving accounts"   : "savings account status",
@@ -63,7 +63,7 @@ FEATURE_LABELS = {
 RECOMMENDATION_RULES = {
     "Checking account": {
         "tip"   : "Reduce monthly debt and maintain a positive checking account balance.",
-        "reason": "Checking account status is the strongest predictor of credit risk."
+        "reason": "Current account behaviour and repayment history is the strongest predictor of credit risk."
     },
     "Duration": {
         "tip"   : "Consider applying for a shorter loan duration if possible.",
