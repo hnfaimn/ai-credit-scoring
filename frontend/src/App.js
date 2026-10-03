@@ -791,7 +791,7 @@ export default function App() {
 
               {/* Score Card */}
               <div className="card score-card">
-                <h2>📊 Credit Assessment Result</h2>
+                <h2>Credit Assessment Result</h2>
                 <div className="score-layout">
                   <div className="gauge">
                     <RadialBarChart
@@ -836,7 +836,7 @@ export default function App() {
 
               {/* Explanations */}
               <div className="card">
-                <h2>🔍 Why Was This Decision Made?</h2>
+                <h2>Why Was This Decision Made?</h2>
                 <p className="section-hint">
                   Top factors our AI identified that influenced your result.
                 </p>
@@ -910,7 +910,7 @@ export default function App() {
 
               {/* Simulator */}
               <div className="card simulator-card">
-                <h2>⭐ What-If Financial Simulator</h2>
+                <h2>What-If Financial Simulator</h2>
                 <p className="sim-desc">
                   See how improving a financial factor would change your
                   approval chances instantly.
