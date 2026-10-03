@@ -29,13 +29,20 @@ app = Flask(__name__)
 CORS(app)
 
 # ── Load models ──────────────────────────────────────────────────────────
-print("Loading models...")
-import os
-BASE_DIR  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-xgb_model = joblib.load(os.path.join(BASE_DIR, "models", "xgb_model.pkl"))
-scaler     = joblib.load(os.path.join(BASE_DIR, "models", "scaler.pkl"))
-explainer  = shap.TreeExplainer(xgb_model)
-print("✅ Models loaded!")
+# ── Lazy model loading ────────────────────────────────────────────────────
+xgb_model = None
+scaler     = None
+explainer  = None
+
+def load_models():
+    global xgb_model, scaler, explainer
+    if xgb_model is None:
+        print("Loading models...")
+        BASE_DIR  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        xgb_model = joblib.load(os.path.join(BASE_DIR, "models", "xgb_model.pkl"))
+        scaler     = joblib.load(os.path.join(BASE_DIR, "models", "scaler.pkl"))
+        explainer  = shap.TreeExplainer(xgb_model)
+        print("✅ Models loaded!")
 
 # ── Feature labels ───────────────────────────────────────────────────────
 FEATURE_LABELS = {
@@ -257,6 +264,7 @@ def get_recommendations(shap_vals, feature_names):
 # ── Routes ────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def home():
+    load_models()
     return jsonify({
         "message"  : "✅ Credit Scoring API is running!",
         "endpoints": ["/predict", "/explain", "/simulate", "/health"]
@@ -264,10 +272,12 @@ def home():
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "models_loaded": True})
+    load_models()
+    return jsonify({"status": "ok", "models_loaded": xgb_model is not None})
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    load_models()
     try:
         data      = request.get_json()
         df_scaled = preprocess_input(data)
@@ -287,6 +297,7 @@ def predict():
 
 @app.route("/explain", methods=["POST"])
 def explain():
+    load_models()
     try:
         data          = request.get_json()
         df_scaled     = preprocess_input(data)
@@ -308,6 +319,7 @@ def explain():
 
 @app.route("/simulate", methods=["POST"])
 def simulate():
+    load_models()
     try:
         data              = request.get_json()
         feature_to_change = data.pop("feature_to_change")
