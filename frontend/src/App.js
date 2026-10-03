@@ -91,10 +91,16 @@ export default function App() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(f => ({
-      ...f,
-      [name]: NUM_FIELDS.includes(name) ? Number(value) : value
-    }));
+    if (NUM_FIELDS.includes(name)) {
+    // Allow empty string while typing
+      if (value === "" || value === "-") {
+        setForm(f => ({ ...f, [name]: value }));
+      } else {
+        setForm(f => ({ ...f, [name]: Number(value) }));
+      }
+    } else {
+      setForm(f => ({ ...f, [name]: value }));
+    }
     if (fieldErrors[name]) {
       setFieldErrors(prev => { const n = {...prev}; delete n[name]; return n; });
     }
@@ -453,8 +459,8 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>💳 AI Credit Scoring System</h1>
-        <p>Explainable AI-Based Credit Assessment &amp; Financial Recommendation</p>
+        <h1> CrediWise</h1>
+        <p>Helping people make wiser financial and loan decisions. </p>
       </header>
 
       <div className="main">
@@ -500,7 +506,7 @@ export default function App() {
                   <label>Age <span className="hint">(years)</span></label>
                   <input type="number" name="age" min="18" max="80"
                     className={fieldErrors.age ? "input-error" : ""}
-                    value={form.age} onChange={handleChange} />
+                    value={form.age} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="age" />
                 </div>
                 <div className="field">
@@ -532,19 +538,19 @@ export default function App() {
                 <div className="field">
                   <label>Employment Duration <span className="hint">(months)</span></label>
                   <input type="number" name="employment_duration" min="0"
-                    value={form.employment_duration} onChange={handleChange} />
+                    value={form.employment_duration} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
                   <label>Monthly Net Income <span className="hint">(RM)</span></label>
                   <input type="number" name="monthly_income" min="0"
                     className={fieldErrors.monthly_income ? "input-error" : ""}
-                    value={form.monthly_income} onChange={handleChange} />
+                    value={form.monthly_income} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="monthly_income" />
                 </div>
                 <div className="field">
                   <label>Number of Dependents</label>
                   <input type="number" name="dependents" min="0" max="10"
-                    value={form.dependents} onChange={handleChange} />
+                    value={form.dependents} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
                   <label>Housing Status</label>
@@ -559,7 +565,7 @@ export default function App() {
                   <label>Monthly Housing Payment <span className="hint">(RM)</span></label>
                   <input type="number" name="monthly_housing_payment" min="0"
                     className={fieldErrors.monthly_housing_payment ? "input-error":""}
-                    value={form.monthly_housing_payment} onChange={handleChange} />
+                    value={form.monthly_housing_payment} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="monthly_housing_payment" />
                 </div>
               </div>
@@ -579,31 +585,31 @@ export default function App() {
                   <label>Monthly Debt Commitments <span className="hint">(RM)</span></label>
                   <input type="number" name="monthly_debt" min="0"
                     className={fieldErrors.monthly_debt ? "input-error" : ""}
-                    value={form.monthly_debt} onChange={handleChange} />
+                    value={form.monthly_debt} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="monthly_debt" />
                 </div>
                 <div className="field">
                   <label>Outstanding Financing <span className="hint">(RM)</span></label>
                   <input type="number" name="outstanding_financing" min="0"
-                    value={form.outstanding_financing} onChange={handleChange} />
+                    value={form.outstanding_financing} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
                   <label>Credit Card Balance <span className="hint">(RM)</span></label>
                   <input type="number" name="credit_card_balance" min="0"
                     className={fieldErrors.credit_card_balance ? "input-error":""}
-                    value={form.credit_card_balance} onChange={handleChange} />
+                    value={form.credit_card_balance} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="credit_card_balance" />
                 </div>
                 <div className="field">
                   <label>Credit Card Limit <span className="hint">(RM)</span></label>
                   <input type="number" name="credit_card_limit" min="0"
-                    value={form.credit_card_limit} onChange={handleChange} />
+                    value={form.credit_card_limit} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
                   <label>Total Savings <span className="hint">(RM)</span></label>
                   <input type="number" name="savings" min="0"
                     className={fieldErrors.savings ? "input-error" : ""}
-                    value={form.savings} onChange={handleChange} />
+                    value={form.savings} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="savings" />
                 </div>
                 <div className="field">
@@ -635,14 +641,14 @@ export default function App() {
                   <label>Loan Amount <span className="hint">(RM)</span></label>
                   <input type="number" name="loan_amount" min="100"
                     className={fieldErrors.loan_amount ? "input-error" : ""}
-                    value={form.loan_amount} onChange={handleChange} />
+                    value={form.loan_amount} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="loan_amount" />
                 </div>
                 <div className="field">
                   <label>Loan Duration <span className="hint">(months)</span></label>
                   <input type="number" name="loan_duration" min="1" max="84"
                     className={fieldErrors.loan_duration ? "input-error" : ""}
-                    value={form.loan_duration} onChange={handleChange} />
+                    value={form.loan_duration} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="loan_duration" />
                 </div>
                 <div className="field full">
