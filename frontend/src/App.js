@@ -463,7 +463,7 @@ export default function App() {
           <img src="/favicon.ico" alt="CrediWise Logo" className="header-logo" />
           <div className="header-text">
             <h1>CrediWise</h1>
-            <p>Explainable AI-Based Credit Assessment &amp; Financial Recommendation</p>
+            <p>Helping people make wiser financial and loan decisions</p>
           </div>
         </div>
       </header>
