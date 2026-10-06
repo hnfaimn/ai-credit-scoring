@@ -14,13 +14,43 @@ body {
 
 /* ── Header ── */
 .header {
-  background: linear-gradient(135deg, #1B3A6B, #2E5FA3);
+  background: linear-gradient(135deg, #065663 0%, #043d47 100%);
   color: white;
-  padding: 24px 40px;
-  border-bottom: 4px solid #F5A623;
+  padding: 16px 40px;
+  border-bottom: 4px solid #07C980;
 }
-.header h1 { font-size: 28px; margin-bottom: 4px; }
-.header p  { font-size: 14px; opacity: 0.85; }
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: white;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.header-text { display: flex; flex-direction: column; }
+
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 2px;
+  color: white;
+}
+
+.header p {
+  font-size: 13px;
+  opacity: 0.85;
+  color: #a8f0d8;
+}
 
 /* ── Main Layout ── */
 .main {
@@ -43,11 +73,11 @@ body {
   overflow: hidden;
 }
 .card h2 {
-  font-size: 16px;
-  color: #1B3A6B;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #F5A623;
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: #065663;
+  border-bottom: 2px solid #07C980;
 }
 
 /* ── Form ── */
@@ -116,7 +146,7 @@ body {
 .btn-primary {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #1B3A6B, #2E5FA3);
+  background: linear-gradient(135deg, #065663, #07C980);
   color: white;
   border: none;
   border-radius: 8px;
@@ -188,7 +218,7 @@ body {
   font-size: 15px;
   margin-bottom: 12px;
 }
-.badge.green { background: #d5f5e3; color: #1e8449; }
+.badge.green { background: #d5f5e3; color: #065663; }
 .badge.red   { background: #fadbd8; color: #c0392b; }
 
 .decision-info p {
@@ -303,8 +333,8 @@ body {
 
 .btn-sim {
   padding: 9px 20px;
-  background: #F5A623;
-  color: #1B3A6B;
+  background: #07C980;
+  color: #065663;
   border: none;
   border-radius: 8px;
   font-weight: 700;
@@ -386,16 +416,16 @@ body {
 
 .tab-btn:hover  { color: #1B3A6B; }
 .tab-btn.active {
-  color: #1B3A6B;
-  border-bottom: 3px solid #F5A623;
+  color: #065663;
+  border-bottom: 3px solid #07C980;
 }
 
 /* ── Section label ── */
 .section-label {
   font-size: 13px;
   font-weight: 700;
-  color: #1B3A6B;
-  background: #eaf0fb;
+  color: #065663;
+  background: #e8faf4;
   padding: 6px 12px;
   border-radius: 6px;
   margin-bottom: 14px;
@@ -411,7 +441,7 @@ body {
 .btn-next {
   flex: 1;
   padding: 10px;
-  background: #1B3A6B;
+  background: #065663;
   color: white;
   border: none;
   border-radius: 8px;
@@ -523,7 +553,7 @@ body {
 }
 .btn-export {
   padding: 8px 18px;
-  background: #1B3A6B;
+  background: #065663;
   color: white;
   border: none;
   border-radius: 8px;
@@ -548,7 +578,7 @@ body {
 /* ── Firebase / History ── */
 .saved-badge {
   font-size: 11px;
-  color: #1e8449;
+  color: #065663;
   font-weight: 600;
   margin-left: 10px;
   background: #d5f5e3;
@@ -564,15 +594,16 @@ body {
 
 .btn-history {
   padding: 8px 16px;
-  background: #f0f4fa;
-  color: #1B3A6B;
-  border: 1.5px solid #1B3A6B;
+  background: #f0faf7;
+  color: #065663;
+  border: 1.5px solid #065663;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
+.btn-history:hover { background: #065663; color: white; }
 .btn-history:hover { background: #1B3A6B; color: white; }
 
 .history-card { margin-bottom: 20px; }
