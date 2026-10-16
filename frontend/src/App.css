@@ -737,3 +737,315 @@ p, span, input, select, td, th, li {
 .sim-desc {
   font-family: 'Lato', sans-serif;
 }
+/* ── Page container ── */
+.page-container {
+  padding: 24px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── Navbar ── */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #065663;
+  padding: 0 32px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.nav-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: white;
+  padding: 3px;
+  object-fit: contain;
+}
+.nav-title {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+}
+.nav-link {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Josefin Sans', sans-serif;
+  transition: all 0.2s;
+}
+.nav-link:hover,
+.nav-link.active {
+  background: #07C980;
+  color: white;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lang-toggle {
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.lang-toggle:hover { background: rgba(255,255,255,0.25); }
+.nav-user {
+  position: relative;
+  cursor: pointer;
+}
+.nav-user-name {
+  color: white;
+  font-size: 13px;
+  font-family: 'Josefin Sans', sans-serif;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+}
+.nav-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  min-width: 150px;
+  z-index: 200;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.nav-user:hover .nav-dropdown { display: block; }
+.dropdown-item {
+  display: block;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #065663;
+  text-decoration: none;
+  transition: background 0.2s;
+  font-family: 'Josefin Sans', sans-serif;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.dropdown-item:hover { background: #e8faf4; }
+.dropdown-item.logout { color: #e74c3c; }
+
+/* ── Landing page ── */
+.landing {
+  min-height: 100vh;
+  display: flex;
+  background: #f0faf7;
+  position: relative;
+  overflow: hidden;
+}
+.landing-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(135deg, #065663 0%, #043d47 100%);
+  clip-path: polygon(0 0, 85% 0, 70% 100%, 0 100%);
+}
+.lang-toggle-landing {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  padding: 6px 14px;
+  background: white;
+  color: #065663;
+  border: 1.5px solid #07C980;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 10;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.landing-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 60px 60px 80px;
+  position: relative;
+  z-index: 1;
+}
+.landing-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: white;
+  padding: 8px;
+  object-fit: contain;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.landing-title {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+.landing-subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 380px;
+}
+.landing-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.landing-feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.landing-feature span { font-size: 24px; }
+.landing-feature p {
+  color: rgba(255,255,255,0.9);
+  font-size: 14px;
+  margin: 0;
+}
+.landing-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  z-index: 1;
+}
+.auth-card {
+  background: white;
+  border-radius: 16px;
+  padding: 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-bottom: 2px solid #e8faf4;
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  font-size: 15px;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.auth-tab.active {
+  color: #065663;
+  border-bottom: 3px solid #07C980;
+  font-weight: 600;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.auth-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.auth-field input {
+  padding: 10px 14px;
+  border: 1.5px solid #dde3f0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+  font-family: 'Lato', sans-serif;
+}
+.auth-field input:focus { border-color: #07C980; }
+.auth-btn {
+  padding: 12px;
+  background: linear-gradient(135deg, #065663, #07C980);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: 'Josefin Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 4px;
+}
+.auth-btn:hover    { opacity: 0.9; }
+.auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.auth-switch {
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+.auth-switch span {
+  color: #07C980;
+  cursor: pointer;
+  font-weight: 600;
+}
+.auth-error   { color: #e74c3c; font-size: 13px; margin: 0; }
+.auth-success { color: #07C980; font-size: 13px; margin: 0; }
+
+/* ── Responsive navbar ── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .landing { flex-direction: column; }
+  .landing-bg {
+    width: 100%;
+    height: 45%;
+    clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+  }
+  .landing-left {
+    padding: 40px 30px 20px;
+    align-items: center;
+    text-align: center;
+  }
+  .landing-title  { font-size: 36px; }
+  .landing-right  { padding: 20px 30px 40px; }
+  .auth-card      { max-width: 100%; }
+}
