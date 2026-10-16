@@ -1,6 +1,18 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, 
-         orderBy, query, serverTimestamp } from "firebase/firestore";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  orderBy, query, doc, setDoc, getDoc,
+  serverTimestamp, where
+} from "firebase/firestore";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  sendEmailVerification,
+  updateProfile
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey           : "AIzaSyBlUdSaKMw-QwwggdgjqCZ3n1eAAmVdLpg",
@@ -11,70 +23,168 @@ const firebaseConfig = {
   appId            : "1:1023272794340:web:088004a313981ca89894f1"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+const app  = initializeApp(firebaseConfig);
+export const db   = getFirestore(app);
+export const auth = getAuth(app);
 
-// ── Save assessment to Firestore ─────────────────────────────────────────
-export const saveAssessment = async (form, result) => {
+// ── AUTH FUNCTIONS ────────────────────────────────────────────────────────
+
+export const registerUser = async (email, password, name, role="applicant") => {
   try {
-    const docRef = await addDoc(collection(db, "assessments"), {
-      // Applicant info
-      age                    : form.age,
-      gender                 : form.gender,
-      employment_status      : form.employment_status,
-      employment_type        : form.employment_type,
-      employment_duration    : form.employment_duration,
-      monthly_income         : form.monthly_income,
-      dependents             : form.dependents,
-      housing_status         : form.housing_status,
-      monthly_housing_payment: form.monthly_housing_payment,
-
-      // Financial info
-      monthly_debt           : form.monthly_debt,
-      outstanding_financing  : form.outstanding_financing,
-      credit_card_balance    : form.credit_card_balance,
-      credit_card_limit      : form.credit_card_limit,
-      savings                : form.savings,
-      repayment_history      : form.repayment_history,
-
-      // Loan info
-      loan_amount            : form.loan_amount,
-      loan_duration          : form.loan_duration,
-      loan_purpose           : form.loan_purpose,
-
-      // Results
-      credit_score           : result.credit_score,
-      decision               : result.decision,
-      risk_class             : result.credit_score >= 70 ? "Low Risk"
-                               : result.credit_score >= 50 ? "Medium Risk"
-                               : "High Risk",
-      explanations           : result.explanations || [],
-      recommendations        : result.recommendations || [],
-
-      // Metadata
-      timestamp              : serverTimestamp(),
-      created_at             : new Date().toISOString(),
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: name });
+    await sendEmailVerification(cred.user);
+    // Save user profile to Firestore
+    await setDoc(doc(db, "users", cred.user.uid), {
+      uid      : cred.user.uid,
+      name,
+      email,
+      role,
+      created_at: serverTimestamp(),
+      language : "en",
     });
-    console.log("✅ Assessment saved:", docRef.id);
-    return docRef.id;
+    return { success: true, user: cred.user };
   } catch (err) {
-    console.error("❌ Failed to save:", err);
+    return { success: false, error: err.message };
+  }
+};
+
+export const loginUser = async (email, password) => {
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    return { success: true, user: cred.user };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};
+
+export const logoutUser = async () => {
+  await signOut(auth);
+};
+
+export const getUserProfile = async (uid) => {
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    return snap.exists() ? snap.data() : null;
+  } catch (err) {
     return null;
   }
 };
 
-// ── Get all past assessments ─────────────────────────────────────────────
-export const getAssessments = async () => {
+// ── ASSESSMENT FUNCTIONS ──────────────────────────────────────────────────
+
+export const saveAssessment = async (form, result, uid=null) => {
+  try {
+    const data = {
+      ...form,
+      credit_score    : result.credit_score,
+      decision        : result.decision,
+      risk_class      : result.credit_score >= 70 ? "Low Risk"
+                        : result.credit_score >= 50 ? "Medium Risk"
+                        : "High Risk",
+      explanations    : result.explanations    || [],
+      recommendations : result.recommendations || [],
+      timestamp       : serverTimestamp(),
+      created_at      : new Date().toISOString(),
+      uid             : uid || "anonymous",
+    };
+
+    // Save to global collection
+    const ref = await addDoc(collection(db, "assessments"), data);
+
+    // Also save under user's personal collection if logged in
+    if (uid) {
+      await addDoc(
+        collection(db, "users", uid, "assessments"), 
+        { ...data, id: ref.id }
+      );
+    }
+    return ref.id;
+  } catch (err) {
+    console.error("Save failed:", err);
+    return null;
+  }
+};
+
+export const getUserAssessments = async (uid) => {
+  try {
+    const q    = query(
+      collection(db, "users", uid, "assessments"),
+      orderBy("timestamp", "desc")
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    return [];
+  }
+};
+
+export const getAllAssessments = async () => {
   try {
     const q    = query(
       collection(db, "assessments"),
       orderBy("timestamp", "desc")
     );
     const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (err) {
-    console.error("❌ Failed to fetch:", err);
     return [];
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    return [];
+  }
+};
+
+// ── FINANCE FUNCTIONS ─────────────────────────────────────────────────────
+
+export const saveExpense = async (uid, expense) => {
+  try {
+    await addDoc(collection(db, "users", uid, "expenses"), {
+      ...expense,
+      timestamp: serverTimestamp(),
+    });
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+export const getUserExpenses = async (uid) => {
+  try {
+    const q    = query(
+      collection(db, "users", uid, "expenses"),
+      orderBy("timestamp", "desc")
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    return [];
+  }
+};
+
+export const saveSavingsGoal = async (uid, goal) => {
+  try {
+    await setDoc(doc(db, "users", uid, "goals", "savings"), {
+      ...goal,
+      updated_at: serverTimestamp(),
+    });
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+export const getSavingsGoal = async (uid) => {
+  try {
+    const snap = await getDoc(doc(db, "users", uid, "goals", "savings"));
+    return snap.exists() ? snap.data() : null;
+  } catch (err) {
+    return null;
   }
 };
