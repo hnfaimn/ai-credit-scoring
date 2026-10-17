@@ -77,9 +77,6 @@ export default function App() {
   const [activeSection, setActiveSection]   = useState("applicant");
   const [exportLoading, setExportLoading]   = useState(false);
   const [savedId, setSavedId]               = useState(null);
-  const [history, setHistory]               = useState([]);
-  const [showHistory, setShowHistory]       = useState(false);
-  const [historyLoading, setHistoryLoading] = useState(false);
   const resultRef = useRef(null);
 
   const NUM_FIELDS = [
@@ -182,19 +179,7 @@ export default function App() {
     }
   };
 
-  // ── Load History ──────────────────────────────────────────────────────
-  const handleLoadHistory = async () => {
-    setHistoryLoading(true);
-    setShowHistory(true);
-    try {
-      const data = await getAssessments();
-      setHistory(data);
-    } catch {
-      setError("Failed to load history.");
-    } finally {
-      setHistoryLoading(false);
-    }
-  };
+
 
   // ── Export PDF ────────────────────────────────────────────────────────
   const handleExportPDF = async () => {
@@ -743,10 +728,6 @@ export default function App() {
                     <span className="saved-badge">✅ Saved to cloud</span>}
                 </span>
                 <div className="export-btns">
-                  <button className="btn-history"
-                    onClick={handleLoadHistory} disabled={historyLoading}>
-                    {historyLoading ? "⏳ Loading..." : "📋 View History"}
-                  </button>
                   <button className="btn-export"
                     onClick={handleExportPDF} disabled={exportLoading}>
                     {exportLoading ? "⏳ Exporting..." : "⬇️ Export PDF"}
@@ -754,45 +735,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* History Panel */}
-              {showHistory && (
-                <div className="card history-card">
-                  <div className="history-header">
-                    <h2>📋 Assessment History</h2>
-                    <button className="btn-close"
-                      onClick={() => setShowHistory(false)}>✕ Close</button>
-                  </div>
-                  {historyLoading
-                    ? <p className="section-hint">Loading records...</p>
-                    : history.length === 0
-                    ? <p className="section-hint">No past assessments found.</p>
-                    : history.map((rec) => (
-                      <div key={rec.id} className="history-item">
-                        <div className="history-left">
-                          <span className={`badge-sm ${rec.decision==="Approved"?"green":"red"}`}>
-                            {rec.decision==="Approved" ? "✅" : "❌"} {rec.decision}
-                          </span>
-                          <span className="history-score">
-                            Score: <strong>{rec.credit_score}/100</strong>
-                          </span>
-                          <span className="history-risk">{rec.risk_class}</span>
-                        </div>
-                        <div className="history-right">
-                          <span className="history-detail">
-                            Age {rec.age} · {rec.employment_type} ·
-                            RM {rec.loan_amount?.toLocaleString()} loan
-                          </span>
-                          <span className="history-date">
-                            {rec.created_at
-                              ? new Date(rec.created_at).toLocaleString()
-                              : "Unknown date"}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </div>
-              )}
+            
 
               {/* Score Card */}
               <div className="card score-card">
