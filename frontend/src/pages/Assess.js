@@ -9,7 +9,6 @@ import {
   CartesianGrid, ResponsiveContainer, Cell
 } from "recharts";
 
-const { user } = useAuth();
 
 const API = "https://ai-credit-scoring-gurz.onrender.com";
 
@@ -68,6 +67,7 @@ function validateForm(form) {
 }
 
 export default function App() {
+  const { user } = useAuth();
   const [form, setForm]               = useState(INITIAL_FORM);
   const [result, setResult]           = useState(null);
   const [loading, setLoading]         = useState(false);
