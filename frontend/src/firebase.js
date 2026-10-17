@@ -2,14 +2,13 @@ import { initializeApp } from "firebase/app";
 import {
   getFirestore, collection, addDoc, getDocs,
   orderBy, query, doc, setDoc, getDoc,
-  serverTimestamp, where
+  serverTimestamp
 } from "firebase/firestore";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
   sendEmailVerification,
   updateProfile
 } from "firebase/auth";
