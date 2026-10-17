@@ -7,7 +7,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   CartesianGrid, ResponsiveContainer, Cell
 } from "recharts";
-import "./App.css";
+
 
 const API = "https://ai-credit-scoring-gurz.onrender.com";
 
