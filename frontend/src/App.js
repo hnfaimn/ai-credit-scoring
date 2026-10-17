@@ -12,17 +12,14 @@ import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import "./App.css";
 
-export default function Assess() {
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
         <Routes>
-          {/* Public */}
-          <Route path="/login"    element={<Landing />} />
-          <Route path="/"         element={<Navigate to="/login" replace />} />
-
-          {/* Protected — Applicant */}
+          <Route path="/login" element={<Landing />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/dashboard/assess" element={
             <ProtectedRoute><Assess /></ProtectedRoute>
           } />
@@ -38,13 +35,9 @@ export default function Assess() {
           <Route path="/dashboard/profile" element={
             <ProtectedRoute><Profile /></ProtectedRoute>
           } />
-
-          {/* Protected — Admin only */}
           <Route path="/admin" element={
             <ProtectedRoute adminOnly={true}><Admin /></ProtectedRoute>
           } />
-
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
