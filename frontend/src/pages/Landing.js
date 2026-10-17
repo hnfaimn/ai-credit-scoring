@@ -56,24 +56,6 @@ export default function Landing() {
         <img src="/favicon.ico" alt="CrediWise" className="landing-logo" />
         <h1 className="landing-title">CrediWise</h1>
         <p className="landing-subtitle">{t(s,"subtitle")}</p>
-        <div className="landing-features">
-          <div className="landing-feature">
-            <span>🤖</span>
-            <p>AI-powered credit scoring</p>
-          </div>
-          <div className="landing-feature">
-            <span>🔍</span>
-            <p>Transparent SHAP explanations</p>
-          </div>
-          <div className="landing-feature">
-            <span>⭐</span>
-            <p>Live what-if simulator</p>
-          </div>
-          <div className="landing-feature">
-            <span>💰</span>
-            <p>Financial management tracker</p>
-          </div>
-        </div>
       </div>
 
       {/* Right side — auth form */}
