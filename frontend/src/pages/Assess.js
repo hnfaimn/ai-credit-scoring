@@ -1,3 +1,4 @@
+import { useAuth } from "../context/AuthContext";
 import React, { useState, useRef } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
@@ -8,6 +9,7 @@ import {
   CartesianGrid, ResponsiveContainer, Cell
 } from "recharts";
 
+const { user } = useAuth();
 
 const API = "https://ai-credit-scoring-gurz.onrender.com";
 
@@ -150,7 +152,7 @@ export default function App() {
     try {
       const res = await axios.post(`${API}/explain`, form, { timeout: 60000 });
       setResult(res.data);
-      const id = await saveAssessment(form, res.data);
+      const id = await saveAssessment(form, res.data, user?.uid);
       setSavedId(id);
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth" });
