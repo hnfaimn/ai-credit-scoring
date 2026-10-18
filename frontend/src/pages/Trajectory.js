@@ -42,9 +42,6 @@ export default function Trajectory() {
   const oldest   = history[history.length - 1];
   const best     = history.length
     ? Math.max(...history.map(h => h.credit_score)) : 0;
-  const avg = history.length
-    ? (history.reduce((a, b) => a + b.credit_score, 0) / history.length).toFixed(1)
-    : 0;
   const improved = history.length >= 2
     ? (latest.credit_score - oldest.credit_score).toFixed(1)
     : 0;
