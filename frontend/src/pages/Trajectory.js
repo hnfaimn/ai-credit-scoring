@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { getUserAssessments } from "../firebase";
 import { STRINGS, t } from "../lang/strings";
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip,
+  XAxis, YAxis, Tooltip,
   CartesianGrid, ResponsiveContainer, ReferenceLine,
   Area, AreaChart
 } from "recharts";
@@ -42,7 +42,7 @@ export default function Trajectory() {
   const oldest   = history[history.length - 1];
   const best     = history.length
     ? Math.max(...history.map(h => h.credit_score)) : 0;
-  const avg      = history.length
+  const avg = history.length
     ? (history.reduce((a, b) => a + b.credit_score, 0) / history.length).toFixed(1)
     : 0;
   const improved = history.length >= 2
