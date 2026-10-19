@@ -204,6 +204,7 @@ export default function Admin() {
         <Tab id="applications" label={lang==="en" ? "📋 Applications": "📋 Permohonan"} />
         <Tab id="fairness"     label={lang==="en" ? "⚖️ Fairness"    : "⚖️ Keadilan"} />
         <Tab id="users"        label={lang==="en" ? "👥 Users"       : "👥 Pengguna"} />
+        <Tab id="analytics" label={lang==="en" ? "🔬 Deep Analysis" : "🔬 Analisis Lanjut"} />
       </div>
 
       {/* ── OVERVIEW TAB ── */}
@@ -284,6 +285,216 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      {/* ── DEEP ANALYTICS TAB ── */}
+      {activeTab === "analytics" && (
+        <div>
+          {/* Top rejection factors */}
+          <div className="card" style={{ marginBottom:20 }}>
+            <h2>🔴 {lang==="en"
+              ? "Top Factors Causing Rejection"
+              : "Faktor Utama Menyebabkan Penolakan"}</h2>
+            <p className="section-hint" style={{ marginBottom:16 }}>
+              {lang==="en"
+                ? "Based on SHAP analysis across all rejected applications."
+                : "Berdasarkan analisis SHAP merentasi semua permohonan yang ditolak."}
+            </p>
+            {(() => {
+              const rejected = assessments.filter(a => a.decision === "Rejected");
+              const featureCount = {};
+              rejected.forEach(a => {
+                a.explanations?.forEach(exp => {
+                  if (exp.shap_val > 0) {
+                    featureCount[exp.label] = (featureCount[exp.label] || 0) + 1;
+                  }
+                });
+              });
+              const sorted = Object.entries(featureCount)
+                .sort((a,b) => b[1]-a[1])
+                .slice(0,5)
+                .map(([label,count]) => ({
+                  label,
+                  count,
+                  pct: rejected.length
+                    ? ((count/rejected.length)*100).toFixed(0)
+                    : 0
+                }));
+              return sorted.length === 0
+                ? <p className="section-hint">
+                    {lang==="en" ? "No rejection data yet." : "Tiada data penolakan lagi."}
+                  </p>
+                : sorted.map((f,i) => (
+                  <div key={i} className="factor-row">
+                    <div className="factor-rank">#{i+1}</div>
+                    <div className="factor-info">
+                      <div style={{ display:"flex", justifyContent:"space-between",
+                        marginBottom:4 }}>
+                        <span className="factor-label">{f.label}</span>
+                        <span className="factor-pct" style={{ color:"#e74c3c" }}>
+                          {f.pct}% {lang==="en" ? "of rejections" : "penolakan"}
+                        </span>
+                      </div>
+                      <div className="factor-bar-bg">
+                        <div className="factor-bar-fill"
+                          style={{ width:`${f.pct}%`, background:"#e74c3c" }} />
+                      </div>
+                      <span className="factor-count">
+                        {f.count} {lang==="en" ? "occurrences" : "kejadian"}
+                      </span>
+                    </div>
+                  </div>
+                ));
+            })()}
+          </div>
+
+    {/* Top approval factors */}
+    <div className="card" style={{ marginBottom:20 }}>
+      <h2>🟢 {lang==="en"
+        ? "Top Factors Supporting Approval"
+        : "Faktor Utama Menyokong Kelulusan"}</h2>
+      <p className="section-hint" style={{ marginBottom:16 }}>
+        {lang==="en"
+          ? "Based on SHAP analysis across all approved applications."
+          : "Berdasarkan analisis SHAP merentasi semua permohonan yang diluluskan."}
+      </p>
+      {(() => {
+        const approved = assessments.filter(a => a.decision === "Approved");
+        const featureCount = {};
+        approved.forEach(a => {
+          a.explanations?.forEach(exp => {
+            if (exp.shap_val < 0) {
+              featureCount[exp.label] = (featureCount[exp.label] || 0) + 1;
+            }
+          });
+        });
+        const sorted = Object.entries(featureCount)
+          .sort((a,b) => b[1]-a[1])
+          .slice(0,5)
+          .map(([label,count]) => ({
+            label,
+            count,
+            pct: approved.length
+              ? ((count/approved.length)*100).toFixed(0)
+              : 0
+          }));
+        return sorted.length === 0
+          ? <p className="section-hint">
+              {lang==="en" ? "No approval data yet." : "Tiada data kelulusan lagi."}
+            </p>
+          : sorted.map((f,i) => (
+            <div key={i} className="factor-row">
+              <div className="factor-rank" style={{ background:"#e8faf4",
+                color:"#07C980" }}>#{i+1}</div>
+              <div className="factor-info">
+                <div style={{ display:"flex", justifyContent:"space-between",
+                  marginBottom:4 }}>
+                  <span className="factor-label">{f.label}</span>
+                  <span className="factor-pct" style={{ color:"#07C980" }}>
+                    {f.pct}% {lang==="en" ? "of approvals" : "kelulusan"}
+                  </span>
+                </div>
+                <div className="factor-bar-bg">
+                  <div className="factor-bar-fill"
+                    style={{ width:`${f.pct}%`, background:"#07C980" }} />
+                </div>
+                <span className="factor-count">
+                  {f.count} {lang==="en" ? "occurrences" : "kejadian"}
+                </span>
+              </div>
+            </div>
+          ));
+      })()}
+    </div>
+
+    {/* Average score by loan purpose */}
+    <div className="card" style={{ marginBottom:20 }}>
+      <h2>🎯 {lang==="en"
+        ? "Average Score by Loan Purpose"
+        : "Skor Purata Mengikut Tujuan Pinjaman"}</h2>
+      {(() => {
+        const purposes = [...new Set(assessments.map(a => a.loan_purpose).filter(Boolean))];
+        const purposeData = purposes.map(p => {
+          const group = assessments.filter(a => a.loan_purpose === p);
+          const avg   = group.reduce((a,b) => a + b.credit_score, 0) / group.length;
+          const appRate = ((group.filter(a =>
+            a.decision==="Approved").length / group.length)*100).toFixed(0);
+          return { purpose:p, avg:avg.toFixed(1), count:group.length, appRate };
+        }).sort((a,b) => b.avg-a.avg);
+        return (
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={purposeData}
+              margin={{ left:0, right:20, top:10, bottom:30 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="purpose" tick={{ fontSize:10 }} angle={-20}
+                textAnchor="end" />
+              <YAxis domain={[0,100]} tickFormatter={v=>`${v}%`}
+                tick={{ fontSize:11 }} />
+              <Tooltip formatter={(v,n,p) => [
+                `${v}% avg score · ${p.payload.appRate}% approved`,
+                p.payload.purpose
+              ]} />
+              <Bar dataKey="avg" fill="#065663" radius={4} />
+            </BarChart>
+          </ResponsiveContainer>
+        );
+      })()}
+    </div>
+
+    {/* Age group analysis */}
+    <div className="card">
+      <h2>👥 {lang==="en"
+        ? "Approval Rate by Age Group"
+        : "Kadar Kelulusan Mengikut Kumpulan Umur"}</h2>
+      {(() => {
+        const ageGroups = [
+          { label:"18-25", min:18, max:25 },
+          { label:"26-35", min:26, max:35 },
+          { label:"36-45", min:36, max:45 },
+          { label:"46-55", min:46, max:55 },
+          { label:"56+",   min:56, max:100 },
+        ];
+        const ageData = ageGroups.map(g => {
+          const group   = assessments.filter(a =>
+            a.age >= g.min && a.age <= g.max);
+          const appRate = group.length
+            ? ((group.filter(a =>
+                a.decision==="Approved").length / group.length)*100).toFixed(0)
+            : 0;
+          const avgScore = group.length
+            ? (group.reduce((a,b) => a + b.credit_score, 0) / group.length).toFixed(1)
+            : 0;
+          return {
+            age     : g.label,
+            appRate : Number(appRate),
+            avgScore: Number(avgScore),
+            count   : group.length
+          };
+        }).filter(g => g.count > 0);
+        return (
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={ageData}
+              margin={{ left:0, right:20, top:10, bottom:0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="age" tick={{ fontSize:12 }} />
+              <YAxis domain={[0,100]} tickFormatter={v=>`${v}%`}
+                tick={{ fontSize:11 }} />
+              <Tooltip formatter={(v,n) => [
+                `${v}%`,
+                n==="appRate"
+                  ? (lang==="en" ? "Approval Rate" : "Kadar Kelulusan")
+                  : (lang==="en" ? "Avg Score" : "Skor Purata")
+              ]} />
+              <Bar dataKey="appRate"  fill="#07C980" radius={4}
+                name={lang==="en" ? "Approval Rate" : "Kadar Kelulusan"} />
+              <Bar dataKey="avgScore" fill="#065663" radius={4}
+                name={lang==="en" ? "Avg Score" : "Skor Purata"} />
+            </BarChart>
+          </ResponsiveContainer>
+        );
+      })()}
+    </div>
+  </div>
+)}
 
       {/* ── APPLICATIONS TAB ── */}
       {activeTab === "applications" && (

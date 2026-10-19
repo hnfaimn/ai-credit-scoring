@@ -1406,3 +1406,59 @@ p, span, input, select, td, th, li {
 @media (max-width: 768px) {
   .profile-grid { grid-template-columns: 1fr; }
 }
+.btn-clear {
+  padding: 8px 16px;
+  background: #fadbd8;
+  color: #c0392b;
+  border: 1.5px solid #e74c3c;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif;
+  transition: all 0.2s;
+}
+.btn-clear:hover    { background: #e74c3c; color: white; }
+.btn-clear:disabled { opacity: 0.6; cursor: not-allowed; }
+/* ── Factor analysis ── */
+.factor-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.factor-rank {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fadbd8;
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.factor-info  { flex: 1; }
+.factor-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #065663;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.factor-pct   { font-size: 12px; font-weight: 600; }
+.factor-bar-bg {
+  background: #f0f0f0;
+  border-radius: 4px;
+  height: 8px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+.factor-bar-fill {
+  height: 8px;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.factor-count { font-size: 11px; color: #888; }

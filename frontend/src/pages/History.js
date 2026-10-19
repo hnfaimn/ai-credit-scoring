@@ -1,3 +1,4 @@
+import { getUserAssessments, clearUserHistory } from "../firebase";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getUserAssessments } from "../firebase";
@@ -13,6 +14,8 @@ export default function History() {
   const [history, setHistory]   = useState([]);
   const [loading, setLoading]   = useState(true);
   const [selected, setSelected] = useState(null);
+  const [clearing, setClearing] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -24,6 +27,20 @@ export default function History() {
     };
     load();
   }, [user]);
+
+  const handleClearHistory = async () => {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      return;
+    }
+    setClearing(true);
+    const success = await clearUserHistory(user.uid);
+    if (success) {
+      setHistory([]);
+      setConfirmClear(false);
+    }
+    setClearing(false);
+  };
 
   const scoreColor = (score) => {
     if (score >= 70) return "#07C980";
@@ -42,8 +59,8 @@ export default function History() {
     }));
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="page-header" style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:12 }}>
+      <div>
         <h1>{t(s, "history_title")}</h1>
         <p className="page-subtitle">
           {lang === "en"
@@ -51,6 +68,28 @@ export default function History() {
             : "Lihat semua penilaian kredit anda yang lepas"}
         </p>
       </div>
+      {history.length > 0 && (
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6 }}>
+          <button
+          className="btn-clear"
+          onClick={handleClearHistory}
+          disabled={clearing}>
+           {clearing ? "⏳ Clearing..."
+            : confirmClear
+            ? (lang==="en" ? "⚠️ Confirm Clear?" : "⚠️ Sahkan Padam?")
+            : (lang==="en" ? "🗑️ Clear History" : "🗑️ Padam Sejarah")}
+          </button>
+          {confirmClear && (
+            <button
+            style={{ fontSize:11, color:"#888", background:"none",
+              border:"none", cursor:"pointer", padding:0 }}
+            onClick={() => setConfirmClear(false)}>
+              {lang==="en" ? "Cancel" : "Batal"}
+            </button>
+          )}
+        </div>
+      )}
+    
 
       {loading ? (
         <div className="card placeholder">

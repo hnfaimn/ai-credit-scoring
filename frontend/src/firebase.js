@@ -187,3 +187,15 @@ export const getSavingsGoal = async (uid) => {
     return null;
   }
 };
+export const clearUserHistory = async (uid) => {
+  try {
+    const q    = query(collection(db, "users", uid, "assessments"));
+    const snap = await getDocs(q);
+    const { deleteDoc } = await import("firebase/firestore");
+    await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+    return true;
+  } catch (err) {
+    console.error("Clear failed:", err);
+    return false;
+  }
+};
