@@ -1312,3 +1312,55 @@ p, span, input, select, td, th, li {
   border-radius: 8px;
   font-size: 13px;
 }
+/* ── Profile ── */
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #065663, #07C980);
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.profile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #065663;
+  font-family: 'Josefin Sans', sans-serif;
+  margin-bottom: 4px;
+}
+.profile-email {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 12px;
+}
+.profile-role-badge {
+  background: #e8faf4;
+  color: #065663;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Josefin Sans', sans-serif;
+  text-transform: capitalize;
+}
+.profile-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+.profile-info-row:last-child { border-bottom: none; }
+.profile-info-row span:first-child { color: #888; }
+.profile-info-row span:last-child  { color: #065663; font-weight: 600; }
+
+@media (max-width: 768px) {
+  .profile-grid { grid-template-columns: 1fr; }
+}
