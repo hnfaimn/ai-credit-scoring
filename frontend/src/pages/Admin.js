@@ -8,7 +8,7 @@ import {
   LineChart, Line
 } from "recharts";
 
-const COLORS = ["#07C980","#f39c12","#e74c3c","#065663","#9b59b6"];
+
 
 export default function Admin() {
   const { lang }                      = useAuth();
