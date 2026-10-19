@@ -751,37 +751,57 @@ p, span, input, select, td, th, li {
   justify-content: space-between;
   background: #065663;
   padding: 0 32px;
-  height: 60px;
+  height: 70px;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
+
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
 }
+
 .nav-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   background: white;
-  padding: 3px;
+  padding: 4px;
   object-fit: contain;
+  flex-shrink: 0;
 }
+
+.nav-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
 .nav-title {
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: white;
   letter-spacing: 1px;
+  line-height: 1.1;
 }
+
+.nav-tagline {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
 .nav-links {
   display: flex;
   gap: 4px;
 }
+
 .nav-link {
   color: rgba(255,255,255,0.8);
   text-decoration: none;
@@ -790,17 +810,31 @@ p, span, input, select, td, th, li {
   font-size: 13px;
   font-family: 'Josefin Sans', sans-serif;
   transition: all 0.2s;
+  font-weight: 400;
 }
-.nav-link:hover,
+
+/* Hover — enlarge and yellow */
+.nav-link:hover {
+  color: #FFD700;
+  font-size: 14px;
+  background: transparent;
+}
+
+/* Active — yellow and slightly larger */
 .nav-link.active {
-  background: #07C980;
-  color: white;
+  color: #FFD700;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  border-bottom: 2px solid #FFD700;
 }
+
 .nav-right {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 .lang-toggle {
   padding: 5px 12px;
   background: rgba(255,255,255,0.15);
@@ -813,6 +847,7 @@ p, span, input, select, td, th, li {
   font-family: 'Josefin Sans', sans-serif;
 }
 .lang-toggle:hover { background: rgba(255,255,255,0.25); }
+
 .nav-user {
   position: relative;
   cursor: pointer;
@@ -855,6 +890,13 @@ p, span, input, select, td, th, li {
 }
 .dropdown-item:hover { background: #e8faf4; }
 .dropdown-item.logout { color: #e74c3c; }
+
+/* ── Responsive navbar ── */
+@media (max-width: 768px) {
+  .nav-links  { display: none; }
+  .nav-tagline { display: none; }
+  .navbar { height: 60px; }
+}
 
 /* ── Landing page ── */
 .landing {

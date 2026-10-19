@@ -445,15 +445,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="header-content">
-          <img src="/favicon.ico" alt="CrediWise Logo" className="header-logo" />
-          <div className="header-text">
-            <h1>CrediWise</h1>
-            <p>Helping people make wiser financial and loan decisions</p>
-          </div>
-        </div>
-      </header>
 
       <div className="main">
 

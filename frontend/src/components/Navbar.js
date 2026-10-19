@@ -21,53 +21,59 @@ export default function Navbar() {
   if (!user) return null;
 
   return (
-    <nav className="navbar">
-      <div className="nav-brand">
-        <img src="/favicon.ico" alt="CrediWise" className="nav-logo" />
-        <span className="nav-title">CrediWise</span>
-      </div>
-
-      <div className="nav-links">
-        <Link to="/dashboard/assess"      className={isActive("/dashboard/assess")}>
-          {t(s,"nav_assess")}
-        </Link>
-        <Link to="/dashboard/history"     className={isActive("/dashboard/history")}>
-          {t(s,"nav_history")}
-        </Link>
-        <Link to="/dashboard/trajectory"  className={isActive("/dashboard/trajectory")}>
-          {t(s,"nav_trajectory")}
-        </Link>
-        <Link to="/dashboard/finance"     className={isActive("/dashboard/finance")}>
-          {t(s,"nav_finance")}
-        </Link>
-        {isAdmin && (
-          <Link to="/admin" className={isActive("/admin")}>
-            {t(s,"nav_admin")}
-          </Link>
-        )}
-      </div>
-
-      <div className="nav-right">
-        {/* Language toggle */}
-        <button className="lang-toggle" onClick={toggleLang}>
-          {lang === "en" ? "🇲🇾 BM" : "🇬🇧 EN"}
-        </button>
-
-        {/* User info */}
-        <div className="nav-user">
-          <span className="nav-user-name">
-            👤 {profile?.name || user.email}
-          </span>
-          <div className="nav-dropdown">
-            <Link to="/dashboard/profile" className="dropdown-item">
-              {t(s,"nav_profile")}
-            </Link>
-            <button onClick={handleLogout} className="dropdown-item logout">
-              {t(s,"nav_logout")}
-            </button>
+      <nav className="navbar">
+        <div className="nav-brand">
+          <img src="/favicon.ico" alt="CrediWise" className="nav-logo" />
+          <div className="nav-brand-text">
+            <span className="nav-title">CrediWise</span>
+            <span className="nav-tagline">
+              Helping people make wiser financial and loan decisions
+            </span>
           </div>
         </div>
-      </div>
-    </nav>
-  );
+
+        <div className="nav-links">
+          <Link to="/dashboard/assess"
+            className={isActive("/dashboard/assess")}>
+            {t(s,"nav_assess")}
+          </Link>
+          <Link to="/dashboard/history"
+            className={isActive("/dashboard/history")}>
+            {t(s,"nav_history")}
+          </Link>
+          <Link to="/dashboard/trajectory"
+            className={isActive("/dashboard/trajectory")}>
+            {t(s,"nav_trajectory")}
+          </Link>
+          <Link to="/dashboard/finance"
+            className={isActive("/dashboard/finance")}>
+           {t(s,"nav_finance")}
+          </Link>
+          {isAdmin && (
+            <Link to="/admin" className={isActive("/admin")}>
+              {t(s,"nav_admin")}
+            </Link>
+          )}
+        </div>
+
+        <div className="nav-right">
+          <button className="lang-toggle" onClick={toggleLang}>
+            {lang === "en" ? "🇲🇾 BM" : "🇬🇧 EN"}
+          </button>
+          <div className="nav-user">
+            <span className="nav-user-name">
+              👤 {profile?.name || user.email}
+            </span>
+            <div className="nav-dropdown">
+              <Link to="/dashboard/profile" className="dropdown-item">
+                {t(s,"nav_profile")}
+              </Link>
+              <button onClick={handleLogout} className="dropdown-item logout">
+                {t(s,"nav_logout")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
 }
