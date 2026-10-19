@@ -1,7 +1,6 @@
-import { getUserAssessments, clearUserHistory } from "../firebase";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getUserAssessments } from "../firebase";
+import { getUserAssessments, clearUserHistory } from "../firebase";
 import { STRINGS, t } from "../lang/strings";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
