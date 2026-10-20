@@ -58,37 +58,39 @@ export default function History() {
     }));
 
   return (
-    <div className="page-header" style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:12 }}>
-      <div>
-        <h1>{t(s, "history_title")}</h1>
-        <p className="page-subtitle">
-          {lang === "en"
-            ? "View all your past credit assessments"
-            : "Lihat semua penilaian kredit anda yang lepas"}
-        </p>
-      </div>
-      {history.length > 0 && (
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6 }}>
-          <button
-          className="btn-clear"
-          onClick={handleClearHistory}
-          disabled={clearing}>
-           {clearing ? "⏳ Clearing..."
-            : confirmClear
-            ? (lang==="en" ? "⚠️ Confirm Clear?" : "⚠️ Sahkan Padam?")
-            : (lang==="en" ? "🗑️ Clear History" : "🗑️ Padam Sejarah")}
-          </button>
-          {confirmClear && (
-            <button
-            style={{ fontSize:11, color:"#888", background:"none",
-              border:"none", cursor:"pointer", padding:0 }}
-            onClick={() => setConfirmClear(false)}>
-              {lang==="en" ? "Cancel" : "Batal"}
-            </button>
-          )}
+    // ✅ FIX: use page-container as outer wrapper (same as Trajectory.js)
+    <div className="page-container">
+      <div className="page-header" style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:12 }}>
+        <div>
+          <h1>{t(s, "history_title")}</h1>
+          <p className="page-subtitle">
+            {lang === "en"
+              ? "View all your past credit assessments"
+              : "Lihat semua penilaian kredit anda yang lepas"}
+          </p>
         </div>
-      )}
-    
+        {history.length > 0 && (
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6 }}>
+            <button
+            className="btn-clear"
+            onClick={handleClearHistory}
+            disabled={clearing}>
+             {clearing ? "⏳ Clearing..."
+              : confirmClear
+              ? (lang==="en" ? "⚠️ Confirm Clear?" : "⚠️ Sahkan Padam?")
+              : (lang==="en" ? "🗑️ Clear History" : "🗑️ Padam Sejarah")}
+            </button>
+            {confirmClear && (
+              <button
+              style={{ fontSize:11, color:"#888", background:"none",
+                border:"none", cursor:"pointer", padding:0 }}
+              onClick={() => setConfirmClear(false)}>
+                {lang==="en" ? "Cancel" : "Batal"}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       {loading ? (
         <div className="card placeholder">
