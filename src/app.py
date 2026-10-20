@@ -62,7 +62,7 @@ FEATURE_LABELS = {
 # ── Recommendation rules ─────────────────────────────────────────────────
 RECOMMENDATION_RULES = {
     "Checking account": {
-        "tip"   : "Reduce monthly debt and maintain a positive checking account balance.",
+        "tip"   : "Reduce monthly debt and maintain a positive account balance.",
         "reason": "Current account behaviour and repayment history is the strongest predictor of credit risk."
     },
     "Duration": {
