@@ -6,10 +6,10 @@ import { STRINGS, t } from "../lang/strings";
 
 export default function Navbar() {
   const { user, profile, lang, toggleLang, isAdmin } = useAuth();
-  const navigate     = useNavigate();
-  const location     = useLocation();
-  const s            = STRINGS[lang];
-  const [open, setOpen] = useState(false);
+  const navigate        = useNavigate();
+  const location        = useLocation();
+  const s               = STRINGS[lang];
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logoutUser();
@@ -18,6 +18,9 @@ export default function Navbar() {
 
   const isActive = (path) =>
     location.pathname === path ? "nav-link active" : "nav-link";
+
+  const isActiveTab = (path) =>
+    location.pathname === path ? "bottom-tab active" : "bottom-tab";
 
   const navItems = [
     { path:"/dashboard/assess",     icon:"⚡", label:t(s,"nav_assess") },
@@ -31,6 +34,7 @@ export default function Navbar() {
 
   return (
     <>
+      {/* ══ TOP NAVBAR ══ */}
       <nav className="navbar">
         {/* Brand */}
         <div className="nav-brand">
@@ -43,8 +47,8 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Desktop links */}
-        <div className="nav-links desktop-only">
+        {/* Desktop links — hidden on mobile */}
+        <div className="nav-links">
           {navItems.map(item => (
             <Link key={item.path} to={item.path}
               className={isActive(item.path)}>
@@ -53,8 +57,8 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Desktop right */}
-        <div className="nav-right desktop-only">
+        {/* Right side — desktop */}
+        <div className="nav-right">
           <button className="lang-toggle" onClick={toggleLang}>
             {lang === "en" ? "🇲🇾 BM" : "🇬🇧 EN"}
           </button>
@@ -73,67 +77,52 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile hamburger */}
-        <button className="hamburger mobile-only" onClick={() => setOpen(true)}>
+        {/* Mobile right — hamburger for profile/lang/logout only */}
+        <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
           <span /><span /><span />
         </button>
       </nav>
 
-      {/* ── Mobile Drawer ── */}
-      {open && (
-        <div className="drawer-overlay" onClick={() => setOpen(false)}>
-          <div className="drawer" onClick={e => e.stopPropagation()}>
-
-            {/* User info */}
-            <div className="drawer-user">
-              <div className="drawer-avatar">
+      {/* ══ MOBILE MINI MENU (profile/lang/logout only) ══ */}
+      {menuOpen && (
+        <>
+          <div className="mini-overlay" onClick={() => setMenuOpen(false)} />
+          <div className="mini-menu">
+            <div className="mini-user">
+              <div className="mini-avatar">
                 {(profile?.name || user.email || "U")[0].toUpperCase()}
               </div>
               <div>
-                <p className="drawer-name">{profile?.name || "User"}</p>
-                <p className="drawer-email">{user.email}</p>
+                <p className="mini-name">{profile?.name || "User"}</p>
+                <p className="mini-email">{user.email}</p>
               </div>
             </div>
-
-            <div className="drawer-divider" />
-
-            {/* Nav items */}
-            <div className="drawer-nav">
-              {navItems.map(item => (
-                <Link key={item.path} to={item.path}
-                  className={`drawer-link ${location.pathname === item.path ? "active" : ""}`}
-                  onClick={() => setOpen(false)}>
-                  <span className="drawer-icon">{item.icon}</span>
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="drawer-divider" />
-
-            {/* Bottom actions */}
-            <div className="drawer-actions">
-              <button className="drawer-action-btn" onClick={() => { toggleLang(); }}>
-                {lang === "en" ? "🇲🇾 Switch to BM" : "🇬🇧 Switch to EN"}
-              </button>
-              <Link to="/dashboard/profile"
-                className="drawer-action-btn"
-                onClick={() => setOpen(false)}>
-                👤 {t(s,"nav_profile")}
-              </Link>
-              <button className="drawer-action-btn logout"
-                onClick={handleLogout}>
-                🚪 {t(s,"nav_logout")}
-              </button>
-            </div>
-
-            {/* Close button */}
-            <button className="drawer-close" onClick={() => setOpen(false)}>
-              ✕
+            <div className="mini-divider" />
+            <button className="mini-item" onClick={() => { toggleLang(); setMenuOpen(false); }}>
+              {lang === "en" ? "🇲🇾 Switch to BM" : "🇬🇧 Switch to EN"}
+            </button>
+            <Link to="/dashboard/profile" className="mini-item"
+              onClick={() => setMenuOpen(false)}>
+              👤 {t(s,"nav_profile")}
+            </Link>
+            <div className="mini-divider" />
+            <button className="mini-item logout" onClick={handleLogout}>
+              🚪 {t(s,"nav_logout")}
             </button>
           </div>
-        </div>
+        </>
       )}
+
+      {/* ══ MOBILE BOTTOM TAB BAR ══ */}
+      <div className="bottom-tabs">
+        {navItems.map(item => (
+          <Link key={item.path} to={item.path}
+            className={isActiveTab(item.path)}>
+            <span className="bottom-tab-icon">{item.icon}</span>
+            <span className="bottom-tab-label">{item.label}</span>
+          </Link>
+        ))}
+      </div>
     </>
   );
 }
