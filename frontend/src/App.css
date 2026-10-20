@@ -933,6 +933,8 @@ p, span, input, select, td, th, li {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;        
+  text-align: center;
   padding: 60px 60px 60px 80px;
   position: relative;
   z-index: 1;
@@ -1030,10 +1032,11 @@ p, span, input, select, td, th, li {
     gap: 16px;
   }
 
+  /* ✅ WITH this */
   .landing-logo {
-    width: 56px;
-    height: 56px;
-    margin-bottom: 0;
+    width: 72px;
+    height: 72px;
+    margin-bottom: 8px;
     flex-shrink: 0;
   }
 
@@ -1143,6 +1146,7 @@ p, span, input, select, td, th, li {
 }
 .auth-error   { color: #e74c3c; font-size: 13px; margin: 0; }
 .auth-success { color: #07C980; font-size: 13px; margin: 0; }
+
 
 /* ══════════════════════════════════════
    NAVBAR — DESKTOP

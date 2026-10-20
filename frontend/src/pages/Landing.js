@@ -55,7 +55,6 @@ export default function Landing() {
       <div className="landing-left">
         <img src="/favicon.ico" alt="CrediWise" className="landing-logo" />
         <h1 className="landing-title">CrediWise</h1>
-        <p className="landing-subtitle">{t(s,"subtitle")}</p>
       </div>
 
       {/* Right side — auth form */}
