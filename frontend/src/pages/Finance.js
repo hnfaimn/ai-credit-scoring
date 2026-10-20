@@ -225,7 +225,7 @@ export default function Finance() {
               </button>
             </div>
           ) : (
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+            <div className="charts-grid-2">
               {/* Pie chart */}
               <div className="card">
                 <h2>{lang==="en" ? "Spending by Category" : "Perbelanjaan Mengikut Kategori"}</h2>

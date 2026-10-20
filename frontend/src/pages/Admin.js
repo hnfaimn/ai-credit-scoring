@@ -210,7 +210,7 @@ export default function Admin() {
       {/* ── OVERVIEW TAB ── */}
       {activeTab === "overview" && (
         <div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:20 }}>
+          <div className="charts-grid-2" style={{ marginBottom: 20 }}>
             {/* Decision pie */}
             <div className="card">
               <h2>{lang==="en" ? "Approval vs Rejection" : "Kelulusan vs Penolakan"}</h2>

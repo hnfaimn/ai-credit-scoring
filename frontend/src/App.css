@@ -392,12 +392,20 @@ body {
 }
 
 /* ── Tabs ── */
+/* ── Tabs ── */
 .tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
   border-bottom: 2px solid #f0f0f0;
   padding-bottom: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar for clean look */
+}
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -412,8 +420,15 @@ body {
   margin-bottom: -2px;
   transition: all 0.2s;
   border-radius: 4px 4px 0 0;
+  flex-shrink: 0; /* Prevents tabs from squishing */
+  white-space: nowrap;
 }
-
+/* ── 2-Column Chart Grid (Desktop: 2 cols, Mobile: 1 col) ── */
+.charts-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
 .tab-btn:hover  { color: #1B3A6B; }
 .tab-btn.active {
   color: #065663;
@@ -1459,6 +1474,9 @@ p, span, input, select, td, th, li {
   .admin-table         { font-size: 11px; }
   .admin-table th,
   .admin-table td      { padding: 8px; }
+  .charts-grid-2       { grid-template-columns: 1fr; }
+  .history-stats       { grid-template-columns: repeat(2,1fr); }
+  .detail-grid         { grid-template-columns: 1fr; }
 }
 /* ── Page header ── */
 .page-header {
