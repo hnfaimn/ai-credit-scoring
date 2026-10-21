@@ -1793,8 +1793,17 @@ p, span, input, select, td, th, li {
   gap: 12px;
 }
 .profile-info-row:last-child { border-bottom: none; }
-.profile-info-row span:first-child { color: #888; }
-.profile-info-row span:last-child  { color: #065663; font-weight: 600; }
+.profile-info-row span:first-child { 
+  color: #888; 
+  white-space: nowrap; 
+  flex-shrink: 0; 
+}
+.profile-info-row span:last-child { 
+  color: #065663; 
+  font-weight: 600; 
+  text-align: right;
+  word-break: break-all;
+}
 
 @media (max-width: 768px) {
   .profile-grid { grid-template-columns: 1fr;

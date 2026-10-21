@@ -50,7 +50,7 @@ export default function Profile() {
         </p>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr", gap:24 }}>
+      <div className="profile-grid">
 
         {/* Left — Avatar & Info */}
         <div>
