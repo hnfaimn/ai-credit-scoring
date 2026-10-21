@@ -1778,6 +1778,11 @@ p, span, input, select, td, th, li {
   font-family: 'Josefin Sans', sans-serif;
   text-transform: capitalize;
 }
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
 .profile-info-row {
   display: flex;
   justify-content: space-between;
@@ -1785,13 +1790,17 @@ p, span, input, select, td, th, li {
   padding: 10px 0;
   border-bottom: 1px solid #f0f0f0;
   font-size: 13px;
+  gap: 12px;
 }
 .profile-info-row:last-child { border-bottom: none; }
 .profile-info-row span:first-child { color: #888; }
 .profile-info-row span:last-child  { color: #065663; font-weight: 600; }
 
 @media (max-width: 768px) {
-  .profile-grid { grid-template-columns: 1fr; }
+  .profile-grid { grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
 }
 .btn-clear {
   padding: 8px 16px;
