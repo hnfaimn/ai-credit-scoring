@@ -450,6 +450,7 @@ export default function App() {
     <button
       className={`tab-btn ${activeSection === id ? "active" : ""}`}
       onClick={() => setActiveSection(id)}>
+      {Icon && <Icon size={15} style={{ marginRight: 5 }} />}
       {label}
     </button>
   );
@@ -491,7 +492,7 @@ export default function App() {
           )}
 
           <div className="tabs">
-            <Tab id="applicant" icon={user} label="Applicant" />
+            <Tab id="applicant" icon={User} label="Applicant" />
             <Tab id="financial" icon={DollarSign} label="Financial" />
             <Tab id="loan" icon={Landmark}     label="Loan" />
           </div>
