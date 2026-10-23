@@ -12,6 +12,7 @@ import {
   User,
   DollarSign,
   Landmark,
+  ChartNoAxesCombined,
   Zap,
   BarChart3,
   CheckCircle2,
@@ -710,7 +711,7 @@ export default function App() {
         <div className="results">
           {!result && !loading && (
             <div className="card placeholder">
-              <div className="placeholder-icon">📊</div>
+              <div className="placeholder-icon" icon={ChartNoAxesCombined}></div>
               <p>Complete the form and click <strong>Assess My Credit</strong> to
                 receive your credit score, AI explanation, and personalised financial tips.</p>
             </div>
