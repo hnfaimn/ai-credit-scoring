@@ -9,8 +9,6 @@ import {
 } from "recharts";
 import {
   BarChart3,
-  CheckCircle2,
-  TrendingUp,
   Users,
   FileText,
   Scale,
