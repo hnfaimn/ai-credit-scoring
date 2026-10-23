@@ -450,7 +450,6 @@ export default function App() {
     <button
       className={`tab-btn ${activeSection === id ? "active" : ""}`}
       onClick={() => setActiveSection(id)}>
-      {Icon && <Icon size={15} style={{ marginRight: 5 }} />}
       {label}
     </button>
   );
