@@ -711,7 +711,7 @@ export default function App() {
         <div className="results">
           {!result && !loading && (
             <div className="card placeholder">
-              <div className="placeholder-icon">icon={ChartNoAxesCombined}</div>
+              <div className="placeholder-icon">🗠</div>
               <p>Complete the form and click <strong>Assess My Credit</strong> to
                 receive your credit score, AI explanation, and personalised financial tips.</p>
             </div>
