@@ -7,7 +7,22 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   LineChart, Line
 } from "recharts";
-
+import {
+  BarChart3,
+  CheckCircle2,
+  TrendingUp,
+  Users,
+  FileText,
+  Scale,
+  Microscope,
+  Download,
+  Check,
+  X,
+  Briefcase,
+  Target,
+  AlertOctagon,
+  Loader2
+} from "lucide-react";
 
 
 export default function Admin() {
@@ -156,7 +171,7 @@ export default function Admin() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>🔧 {t(s,"admin_title")}</h1>
+        <h1>{t(s,"admin_title")}</h1>
         <p className="page-subtitle">
           {lang==="en"
             ? `${total} total assessments · ${users.length} registered users`
@@ -200,11 +215,11 @@ export default function Admin() {
 
       {/* Tabs */}
       <div className="tabs" style={{ marginBottom:20 }}>
-        <Tab id="overview"     label={lang==="en" ? "📊 Overview"   : "📊 Gambaran"} />
-        <Tab id="applications" label={lang==="en" ? "📋 Applications": "📋 Permohonan"} />
-        <Tab id="fairness"     label={lang==="en" ? "⚖️ Fairness"    : "⚖️ Keadilan"} />
-        <Tab id="users"        label={lang==="en" ? "👥 Users"       : "👥 Pengguna"} />
-        <Tab id="analytics" label={lang==="en" ? "🔬 Deep Analysis" : "🔬 Analisis Lanjut"} />
+        <Tab id="overview"   icon={BarChart3}  label={lang==="en" ? "Overview"   : "Gambaran"} />
+        <Tab id="applications" icon={FileText} label={lang==="en" ? "Applications": "Permohonan"} />
+        <Tab id="fairness"     icon={Scale} label={lang==="en" ? "Fairness"    : "Keadilan"} />
+        <Tab id="users"        icon={Users} label={lang==="en" ? "Users"       : "Pengguna"} />
+        <Tab id="analytics" icon={Microscope} label={lang==="en" ? "Deep Analysis" : "Analisis Lanjut"} />
       </div>
 
       {/* ── OVERVIEW TAB ── */}

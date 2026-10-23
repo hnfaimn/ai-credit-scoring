@@ -8,6 +8,22 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   CartesianGrid, ResponsiveContainer, Cell
 } from "recharts";
+import {
+  User,
+  DollarSign,
+  Landmark,
+  Zap,
+  BarChart3,
+  CheckCircle2,
+  AlertCircle,
+  Lightbulb,
+  Sliders,
+  Download,
+  Check,
+  X,
+  Play,
+  Loader2
+} from "lucide-react";
 
 
 const API = "https://ai-credit-scoring-gurz.onrender.com";
@@ -450,7 +466,7 @@ export default function App() {
 
         {/* ══ LEFT: FORM ══ */}
         <div className="card form-card">
-          <h2>📋 Loan Application Form</h2>
+          <h2>Loan Application Form</h2>
           <p className="form-hint">Complete all sections for an accurate assessment.</p>
 
           {/* DTI Banner */}
@@ -475,9 +491,9 @@ export default function App() {
           )}
 
           <div className="tabs">
-            <Tab id="applicant" label="👤 Applicant" />
-            <Tab id="financial" label="💰 Financial" />
-            <Tab id="loan"      label="🏦 Loan" />
+            <Tab id="applicant" icon={user} label="Applicant" />
+            <Tab id="financial" icon={DollarSign} label="Financial" />
+            <Tab id="loan" icon={Landmark}     label="Loan" />
           </div>
 
           {/* Tab 1 */}

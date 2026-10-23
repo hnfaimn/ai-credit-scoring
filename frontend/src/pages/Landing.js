@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser, registerUser } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { STRINGS, t } from "../lang/strings";
+import { CheckCircle2, AlertCircle, Globe } from "lucide-react";
 
 export default function Landing() {
   const [mode, setMode]         = useState("login");
@@ -47,8 +48,8 @@ export default function Landing() {
       <div className="landing-bg" />
 
       {/* Language toggle */}
-      <button className="lang-toggle-landing" onClick={toggleLang}>
-        {lang === "en" ? "🇲🇾 BM" : "🇬🇧 EN"}
+      <button className="lang-toggle-landing" onClick={toggleLang} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+        <Globe size={13} /> {lang === "en" ? "BM" : "EN"}
       </button>
 
       {/* Left side — branding */}
@@ -73,8 +74,16 @@ export default function Landing() {
             </button>
           </div>
 
-          {success && <p className="auth-success">✅ {success}</p>}
-          {error   && <p className="auth-error">⚠️ {error}</p>}
+          {success && (
+            <p className="auth-success" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <CheckCircle2 size={16} /> {success}
+            </p>
+          )}
+          {error && (
+            <p className="auth-error" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <AlertCircle size={16} /> {error}
+            </p>
+          )}
 
           {mode === "login" ? (
             <form onSubmit={handleLogin} className="auth-form">

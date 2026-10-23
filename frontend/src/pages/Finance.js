@@ -6,6 +6,21 @@ import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from "recharts";
+import {
+  DollarSign,
+  Receipt,
+  Target,
+  FileText,
+  BarChart3,
+  Link2,
+  Plus,
+  TrendingDown,
+  PiggyBank,
+  Calendar,
+  Home,
+  Zap,
+  Loader2
+} from "lucide-react";
 
 const CATEGORIES = {
   en: ["Food & Dining", "Transport", "Bills & Utilities", "Shopping", "Health", "Education", "Entertainment", "Others"],
@@ -133,10 +148,13 @@ export default function Finance() {
     ? Math.min(100, (goal.current / goal.target) * 100).toFixed(1)
     : 0;
 
-  const Tab = ({ id, label }) => (
+  const Tab = ({ id, label, icon: Icon }) => (
     <button
       className={`tab-btn ${activeTab === id ? "active" : ""}`}
-      onClick={() => setActiveTab(id)}>
+      onClick={() => setActiveTab(id)}
+      style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+    >
+      {Icon && <Icon size={15} />}
       {label}
     </button>
   );
@@ -144,7 +162,9 @@ export default function Finance() {
   if (loading) return (
     <div className="page-container">
       <div className="card placeholder">
-        <div className="placeholder-icon spinning">⏳</div>
+        <div className="placeholder-icon spinning">
+          <Loader2 size={40} />
+        </div>
         <p>{lang==="en" ? "Loading..." : "Memuatkan..."}</p>
       </div>
     </div>
@@ -153,7 +173,7 @@ export default function Finance() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>💰 {t(s, "fin_title")}</h1>
+        <h1>{t(s, "fin_title")}</h1>
         <p className="page-subtitle">
           {lang==="en"
             ? "Track your expenses and savings to improve your credit profile"
@@ -164,7 +184,9 @@ export default function Finance() {
       {/* Stats row */}
       <div className="history-stats" style={{ marginBottom:20 }}>
         <div className="stat-card">
-          <span className="stat-icon">💸</span>
+          <span className="stat-icon">
+            <DollarSign size={24} color="#065663" />
+          </span>
           <div>
             <p className="stat-label">
               {lang==="en" ? "This Month" : "Bulan Ini"}
@@ -173,7 +195,9 @@ export default function Finance() {
           </div>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">📊</span>
+          <span className="stat-icon">
+            <Receipt size={24} color="#065663" />
+          </span>
           <div>
             <p className="stat-label">
               {lang==="en" ? "Total Expenses" : "Jumlah Perbelanjaan"}
@@ -182,7 +206,9 @@ export default function Finance() {
           </div>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">🎯</span>
+          <span className="stat-icon">
+            <Target size={24} color="#07C980" />
+          </span>
           <div>
             <p className="stat-label">
               {lang==="en" ? "Savings Goal" : "Sasaran Simpanan"}
@@ -193,7 +219,9 @@ export default function Finance() {
           </div>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">📝</span>
+          <span className="stat-icon">
+            <FileText size={24} color="#065663" />
+          </span>
           <div>
             <p className="stat-label">
               {lang==="en" ? "Total Records" : "Jumlah Rekod"}
@@ -205,10 +233,10 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="tabs" style={{ marginBottom:20 }}>
-        <Tab id="overview"  label={lang==="en" ? "📊 Overview"  : "📊 Gambaran"} />
-        <Tab id="expenses"  label={lang==="en" ? "💸 Expenses"  : "💸 Perbelanjaan"} />
-        <Tab id="savings"   label={lang==="en" ? "🎯 Savings Goal" : "🎯 Sasaran Simpanan"} />
-        <Tab id="credit"    label={lang==="en" ? "🔗 Credit Link" : "🔗 Pautan Kredit"} />
+        <Tab id="overview" icon={BarChart3} label={lang==="en" ? "Overview" : "Gambaran"} />
+        <Tab id="expenses" icon={Receipt}   label={lang==="en" ? "Expenses" : "Perbelanjaan"} />
+        <Tab id="savings"  icon={Target}    label={lang==="en" ? "Savings Goal" : "Sasaran Simpanan"} />
+        <Tab id="credit"   icon={Link2}     label={lang==="en" ? "Credit Link" : "Pautan Kredit"} />
       </div>
 
       {/* ── OVERVIEW TAB ── */}
@@ -216,7 +244,9 @@ export default function Finance() {
         <div>
           {expenses.length === 0 ? (
             <div className="card placeholder">
-              <div className="placeholder-icon">💸</div>
+              <div className="placeholder-icon">
+                <Receipt size={40} color="#065663" />
+              </div>
               <p>{lang==="en" ? "No expenses recorded yet." : "Tiada perbelanjaan direkodkan."}</p>
               <button className="btn-primary"
                 style={{ marginTop:16, width:"auto", padding:"10px 24px" }}
@@ -270,10 +300,19 @@ export default function Finance() {
           <div className="card">
             <div style={{ display:"flex", justifyContent:"space-between",
               alignItems:"center", marginBottom:16 }}>
-              <h2>💸 {lang==="en" ? "Expense Records" : "Rekod Perbelanjaan"}</h2>
+              <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Receipt size={20} color="#065663" />
+                {lang==="en" ? "Expense Records" : "Rekod Perbelanjaan"}
+              </h2>
               <button className="btn-sim"
-                onClick={() => setShowExpForm(!showExpForm)}>
-                {showExpForm ? "✕" : `+ ${t(s,"fin_expense")}`}
+                onClick={() => setShowExpForm(!showExpForm)}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+              >
+                {showExpForm ? "✕" : (
+                  <>
+                    <Plus size={14} /> {t(s,"fin_expense")}
+                  </>
+                )}
               </button>
             </div>
 
@@ -352,7 +391,10 @@ export default function Finance() {
       {/* ── SAVINGS GOAL TAB ── */}
       {activeTab === "savings" && (
         <div className="card">
-          <h2>🎯 {t(s,"fin_goal")}</h2>
+          <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Target size={20} color="#065663" />
+            {t(s,"fin_goal")}
+          </h2>
 
           {goal && (
             <div className="goal-display">
@@ -408,9 +450,12 @@ export default function Finance() {
       {activeTab === "credit" && (
         <div>
           <div className="card" style={{ marginBottom:20 }}>
-            <h2>🔗 {lang==="en"
-              ? "How Your Spending Affects Your Credit"
-              : "Bagaimana Perbelanjaan Anda Mempengaruhi Kredit"}</h2>
+            <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Link2 size={20} color="#065663" />
+              {lang==="en"
+                ? "How Your Spending Affects Your Credit"
+                : "Bagaimana Perbelanjaan Anda Mempengaruhi Kredit"}
+            </h2>
             <p className="section-hint" style={{ marginBottom:16 }}>
               {lang==="en"
                 ? "Based on your recorded expenses, here is how your financial behaviour impacts your credit assessment."
@@ -439,28 +484,28 @@ export default function Finance() {
             <div className="credit-tips">
               {[
                 {
-                  icon :"📉",
+                  icon : <TrendingDown size={20} color="#e74c3c" />,
                   title: lang==="en" ? "Reduce Non-Essential Spending" : "Kurangkan Perbelanjaan Tidak Penting",
                   desc : lang==="en"
                     ? "High entertainment and shopping expenses increase your DTI ratio, which negatively impacts your credit score."
                     : "Perbelanjaan hiburan dan membeli-belah yang tinggi meningkatkan nisbah DTI anda, yang memberi kesan negatif kepada skor kredit."
                 },
                 {
-                  icon :"💰",
+                  icon : <PiggyBank size={20} color="#07C980" />,
                   title: lang==="en" ? "Build Emergency Fund" : "Bina Dana Kecemasan",
                   desc : lang==="en"
                     ? "Aim to save at least 3-6 months of expenses. Higher savings improve your credit assessment score."
                     : "Sasarkan simpanan sekurang-kurangnya 3-6 bulan perbelanjaan. Simpanan yang lebih tinggi meningkatkan skor penilaian kredit anda."
                 },
                 {
-                  icon :"📅",
+                  icon : <Calendar size={20} color="#065663" />,
                   title: lang==="en" ? "Pay Bills on Time" : "Bayar Bil Tepat Masa",
                   desc : lang==="en"
                     ? "Consistent on-time payments are the strongest positive factor in your credit assessment."
                     : "Pembayaran tepat masa yang konsisten adalah faktor positif terkuat dalam penilaian kredit anda."
                 },
                 {
-                  icon :"🏠",
+                  icon : <Home size={20} color="#065663" />,
                   title: lang==="en" ? "Manage Housing Costs" : "Urus Kos Perumahan",
                   desc : lang==="en"
                     ? "Keep housing payments below 30% of your monthly income to maintain a healthy DTI ratio."
@@ -468,7 +513,9 @@ export default function Finance() {
                 },
               ].map((tip, i) => (
                 <div key={i} className="credit-tip-item">
-                  <span className="credit-tip-icon">{tip.icon}</span>
+                  <span className="credit-tip-icon" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {tip.icon}
+                  </span>
                   <div>
                     <p className="tip-text">{tip.title}</p>
                     <p className="tip-reason">{tip.desc}</p>
@@ -481,8 +528,9 @@ export default function Finance() {
               <a href="/dashboard/assess"
                 style={{ textDecoration:"none" }}>
                 <button className="btn-primary"
-                  style={{ width:"auto", padding:"12px 32px" }}>
-                  ⚡ {lang==="en"
+                  style={{ width:"auto", padding:"12px 32px", display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <Zap size={16} />
+                  {lang==="en"
                     ? "Do a Credit Assessment Now"
                     : "Buat Penilaian Kredit Sekarang"}
                 </button>

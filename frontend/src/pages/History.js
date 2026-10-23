@@ -6,6 +6,22 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip,
   CartesianGrid, ResponsiveContainer
 } from "recharts";
+import {
+  Loader2,
+  Trash2,
+  AlertTriangle,
+  TrendingUp,
+  BarChart3,
+  CheckCircle2,
+  Award,
+  Scale,
+  FileText,
+  Check,
+  X,
+  Search,
+  Lightbulb,
+  ClipboardList
+} from "lucide-react";
 
 export default function History() {
   const { user, lang }          = useAuth();
@@ -58,7 +74,6 @@ export default function History() {
     }));
 
   return (
-    // ✅ FIX: use page-container as outer wrapper (same as Trajectory.js)
     <div className="page-container">
       <div className="page-header" style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:12 }}>
         <div>
@@ -72,19 +87,30 @@ export default function History() {
         {history.length > 0 && (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6 }}>
             <button
-            className="btn-clear"
-            onClick={handleClearHistory}
-            disabled={clearing}>
-             {clearing ? "⏳ Clearing..."
-              : confirmClear
-              ? (lang==="en" ? "⚠️ Confirm Clear?" : "⚠️ Sahkan Padam?")
-              : (lang==="en" ? "🗑️ Clear History" : "🗑️ Padam Sejarah")}
+              className="btn-clear"
+              onClick={handleClearHistory}
+              disabled={clearing}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+            >
+              {clearing ? (
+                <>
+                  <Loader2 size={14} className="spinning" /> Clearing...
+                </>
+              ) : confirmClear ? (
+                <>
+                  <AlertTriangle size={14} /> {lang==="en" ? "Confirm Clear?" : "Sahkan Padam?"}
+                </>
+              ) : (
+                <>
+                  <Trash2 size={14} /> {lang==="en" ? "Clear History" : "Padam Sejarah"}
+                </>
+              )}
             </button>
             {confirmClear && (
               <button
-              style={{ fontSize:11, color:"#888", background:"none",
-                border:"none", cursor:"pointer", padding:0 }}
-              onClick={() => setConfirmClear(false)}>
+                style={{ fontSize:11, color:"#888", background:"none",
+                  border:"none", cursor:"pointer", padding:0 }}
+                onClick={() => setConfirmClear(false)}>
                 {lang==="en" ? "Cancel" : "Batal"}
               </button>
             )}
@@ -94,12 +120,16 @@ export default function History() {
 
       {loading ? (
         <div className="card placeholder">
-          <div className="placeholder-icon spinning">⏳</div>
+          <div className="placeholder-icon spinning">
+            <Loader2 size={40} />
+          </div>
           <p>{lang === "en" ? "Loading history..." : "Memuatkan sejarah..."}</p>
         </div>
       ) : history.length === 0 ? (
         <div className="card placeholder">
-          <div className="placeholder-icon">📋</div>
+          <div className="placeholder-icon">
+            <ClipboardList size={40} color="#065663" />
+          </div>
           <p>{t(s, "no_history")}</p>
         </div>
       ) : (
@@ -107,7 +137,9 @@ export default function History() {
           {/* Score trend mini chart */}
           {history.length > 1 && (
             <div className="card" style={{ marginBottom: 20 }}>
-              <h2>📈 {lang === "en" ? "Score Trend" : "Trend Skor"}</h2>
+              <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <TrendingUp size={20} color="#065663" /> {lang === "en" ? "Score Trend" : "Trend Skor"}
+              </h2>
               <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={chartData}
                   margin={{ left: 0, right: 20, top: 10, bottom: 0 }}>
@@ -134,7 +166,9 @@ export default function History() {
           {/* Stats row */}
           <div className="history-stats">
             <div className="stat-card">
-              <span className="stat-icon">📊</span>
+              <span className="stat-icon">
+                <BarChart3 size={24} color="#065663" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang === "en" ? "Total Assessments" : "Jumlah Penilaian"}
@@ -143,7 +177,9 @@ export default function History() {
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">✅</span>
+              <span className="stat-icon">
+                <CheckCircle2 size={24} color="#07C980" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang === "en" ? "Approved" : "Diluluskan"}
@@ -154,7 +190,9 @@ export default function History() {
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">📈</span>
+              <span className="stat-icon">
+                <Award size={24} color="#07C980" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang === "en" ? "Best Score" : "Skor Terbaik"}
@@ -165,7 +203,9 @@ export default function History() {
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">⚖️</span>
+              <span className="stat-icon">
+                <Scale size={24} color="#065663" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang === "en" ? "Average Score" : "Skor Purata"}
@@ -180,7 +220,9 @@ export default function History() {
 
           {/* Assessment list */}
           <div className="card">
-            <h2>📋 {lang === "en" ? "All Assessments" : "Semua Penilaian"}</h2>
+            <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <FileText size={20} color="#065663" /> {lang === "en" ? "All Assessments" : "Semua Penilaian"}
+            </h2>
             {history.map((rec, i) => (
               <div key={rec.id || i}>
                 <div
@@ -189,8 +231,8 @@ export default function History() {
                 >
                   <div className="history-left">
                     <span className={`badge-sm ${rec.decision === "Approved"
-                      ? "green" : "red"}`}>
-                      {rec.decision === "Approved" ? "✅" : "❌"}{" "}
+                      ? "green" : "red"}`} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      {rec.decision === "Approved" ? <Check size={13} /> : <X size={13} />}{" "}
                       {lang === "en"
                         ? rec.decision
                         : rec.decision === "Approved"
@@ -228,8 +270,9 @@ export default function History() {
                   <div className="history-detail-panel">
                     <div className="detail-grid">
                       <div className="detail-section">
-                        <h4>
-                          {lang === "en" ? "🔍 Why This Decision?" : "🔍 Mengapa Keputusan Ini?"}
+                        <h4 style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <Search size={16} color="#065663" />
+                          {lang === "en" ? "Why This Decision?" : "Mengapa Keputusan Ini?"}
                         </h4>
                         {rec.explanations?.map((exp, j) => (
                           <div key={j} className="exp-bar" style={{
@@ -242,8 +285,9 @@ export default function History() {
                         ))}
                       </div>
                       <div className="detail-section">
-                        <h4>
-                          {lang === "en" ? "💡 Recommendations" : "💡 Cadangan"}
+                        <h4 style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <Lightbulb size={16} color="#065663" />
+                          {lang === "en" ? "Recommendations" : "Cadangan"}
                         </h4>
                         {rec.recommendations?.map((tip, j) => (
                           <div key={j} className="tip-item" style={{ padding: "8px 0" }}>

@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { STRINGS, t } from "../lang/strings";
+import { Mail, Shield, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export default function Profile() {
   const { user, profile, lang } = useAuth();
@@ -42,7 +43,7 @@ export default function Profile() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>👤 {t(s,"nav_profile")}</h1>
+        <h1>{t(s,"nav_profile")}</h1>
         <p className="page-subtitle">
           {lang==="en"
             ? "Manage your personal information"
@@ -69,21 +70,33 @@ export default function Profile() {
           <div className="card" style={{ marginTop:16 }}>
             <h2>{lang==="en" ? "Account Info" : "Maklumat Akaun"}</h2>
             <div className="profile-info-row">
-              <span>📧 {lang==="en" ? "Email" : "E-mel"}</span>
+              <span style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+                <Mail size={15} /> {lang==="en" ? "Email" : "E-mel"}
+              </span>
               <span>{user?.email}</span>
             </div>
             <div className="profile-info-row">
-              <span>🔐 {lang==="en" ? "Role" : "Peranan"}</span>
+              <span style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+                <Shield size={15} /> {lang==="en" ? "Role" : "Peranan"}
+              </span>
               <span style={{ textTransform:"capitalize" }}>
                 {profile?.role || "applicant"}
               </span>
             </div>
             <div className="profile-info-row">
-              <span>✅ {lang==="en" ? "Email Verified" : "E-mel Disahkan"}</span>
-              <span style={{ color: user?.emailVerified ? "#07C980" : "#e74c3c" }}>
-                {user?.emailVerified
-                  ? (lang==="en" ? "Yes" : "Ya")
-                  : (lang==="en" ? "No" : "Tidak")}
+              <span style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+                <CheckCircle2 size={15} /> {lang==="en" ? "Email Verified" : "E-mel Disahkan"}
+              </span>
+              <span style={{ color: user?.emailVerified ? "#07C980" : "#e74c3c", display:"inline-flex", alignItems:"center", gap:4 }}>
+                {user?.emailVerified ? (
+                  <>
+                    <CheckCircle2 size={14} /> {lang==="en" ? "Yes" : "Ya"}
+                  </>
+                ) : (
+                  <>
+                    <XCircle size={14} /> {lang==="en" ? "No" : "Tidak"}
+                  </>
+                )}
               </span>
             </div>
           </div>
@@ -93,8 +106,16 @@ export default function Profile() {
         <div className="card">
           <h2>{lang==="en" ? "Edit Profile" : "Edit Profil"}</h2>
 
-          {success && <p className="auth-success" style={{ marginBottom:12 }}>✅ {success}</p>}
-          {error   && <p className="auth-error"   style={{ marginBottom:12 }}>⚠️ {error}</p>}
+          {success && (
+            <p className="auth-success" style={{ marginBottom:12, display:"flex", alignItems:"center", gap:6 }}>
+              <CheckCircle2 size={16} /> {success}
+            </p>
+          )}
+          {error && (
+            <p className="auth-error" style={{ marginBottom:12, display:"flex", alignItems:"center", gap:6 }}>
+              <AlertCircle size={16} /> {error}
+            </p>
+          )}
 
           <div className="form-grid">
             <div className="field full">

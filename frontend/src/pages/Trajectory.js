@@ -7,6 +7,22 @@ import {
   CartesianGrid, ResponsiveContainer, ReferenceLine,
   Area, AreaChart
 } from "recharts";
+import {
+  BarChart3,
+  Trophy,
+  TrendingUp,
+  TrendingDown,
+  CheckCircle2,
+  Medal,
+  Lightbulb,
+  Loader2,
+  Flag,
+  ShieldCheck,
+  Star,
+  Flame,
+  Check,
+  X
+} from "lucide-react";
 
 export default function Trajectory() {
   const { user, lang }        = useAuth();
@@ -52,13 +68,13 @@ export default function Trajectory() {
 
   // Milestone badges
   const milestones = [];
-  if (history.length >= 1)  milestones.push({ icon:"🏁", label: lang==="en" ? "First Assessment" : "Penilaian Pertama" });
-  if (best >= 70)           milestones.push({ icon:"🟢", label: lang==="en" ? "Reached Low Risk" : "Capai Risiko Rendah" });
-  if (best >= 80)           milestones.push({ icon:"⭐", label: lang==="en" ? "Score Above 80%" : "Skor Melebihi 80%" });
+  if (history.length >= 1)  milestones.push({ icon: <Flag size={18} color="#065663" />, label: lang==="en" ? "First Assessment" : "Penilaian Pertama" });
+  if (best >= 70)           milestones.push({ icon: <ShieldCheck size={18} color="#07C980" />, label: lang==="en" ? "Reached Low Risk" : "Capai Risiko Rendah" });
+  if (best >= 80)           milestones.push({ icon: <Star size={18} color="#f39c12" />, label: lang==="en" ? "Score Above 80%" : "Skor Melebihi 80%" });
   if (history.filter(h => h.decision==="Approved").length >= 1)
-                            milestones.push({ icon:"✅", label: lang==="en" ? "First Approval" : "Kelulusan Pertama" });
-  if (history.length >= 5)  milestones.push({ icon:"🔥", label: lang==="en" ? "5 Assessments Done" : "5 Penilaian Selesai" });
-  if (Number(improved) > 0) milestones.push({ icon:"📈", label: lang==="en" ? "Score Improved" : "Skor Meningkat" });
+                            milestones.push({ icon: <CheckCircle2 size={18} color="#07C980" />, label: lang==="en" ? "First Approval" : "Kelulusan Pertama" });
+  if (history.length >= 5)  milestones.push({ icon: <Flame size={18} color="#e74c3c" />, label: lang==="en" ? "5 Assessments Done" : "5 Penilaian Selesai" });
+  if (Number(improved) > 0) milestones.push({ icon: <TrendingUp size={18} color="#07C980" />, label: lang==="en" ? "Score Improved" : "Skor Meningkat" });
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }) => {
@@ -74,11 +90,15 @@ export default function Trajectory() {
             {lang==="en" ? "Score" : "Skor"}: <strong>{d.score}%</strong>
           </p>
           <p className="tt-decision" style={{
-            color: d.decision === "Approved" ? "#07C980" : "#e74c3c"
+            color: d.decision === "Approved" ? "#07C980" : "#e74c3c",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4
           }}>
+            {d.decision === "Approved" ? <Check size={14} /> : <X size={14} />}
             {d.decision === "Approved"
-              ? (lang==="en" ? "✅ Approved" : "✅ Diluluskan")
-              : (lang==="en" ? "❌ Rejected" : "❌ Ditolak")}
+              ? (lang==="en" ? "Approved" : "Diluluskan")
+              : (lang==="en" ? "Rejected" : "Ditolak")}
           </p>
         </div>
       );
@@ -95,12 +115,16 @@ export default function Trajectory() {
 
       {loading ? (
         <div className="card placeholder">
-          <div className="placeholder-icon spinning">⏳</div>
+          <div className="placeholder-icon spinning">
+            <Loader2 size={40} />
+          </div>
           <p>{lang==="en" ? "Loading trajectory..." : "Memuatkan trajektori..."}</p>
         </div>
       ) : history.length < 2 ? (
         <div className="card placeholder">
-          <div className="placeholder-icon">📈</div>
+          <div className="placeholder-icon">
+            <TrendingUp size={40} color="#065663" />
+          </div>
           <p>{t(s, "traj_empty")}</p>
           <a href="/dashboard/assess" className="btn-primary"
             style={{ display:"inline-block", marginTop:16, textDecoration:"none",
@@ -114,7 +138,9 @@ export default function Trajectory() {
           {/* Stats row */}
           <div className="history-stats" style={{ marginBottom:20 }}>
             <div className="stat-card">
-              <span className="stat-icon">📊</span>
+              <span className="stat-icon">
+                <BarChart3 size={24} color="#065663" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang==="en" ? "Total Assessments" : "Jumlah Penilaian"}
@@ -123,7 +149,9 @@ export default function Trajectory() {
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">🏆</span>
+              <span className="stat-icon">
+                <Trophy size={24} color="#f39c12" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang==="en" ? "Best Score" : "Skor Terbaik"}
@@ -133,7 +161,11 @@ export default function Trajectory() {
             </div>
             <div className="stat-card">
               <span className="stat-icon">
-                {Number(improved) >= 0 ? "📈" : "📉"}
+                {Number(improved) >= 0 ? (
+                  <TrendingUp size={24} color="#07C980" />
+                ) : (
+                  <TrendingDown size={24} color="#e74c3c" />
+                )}
               </span>
               <div>
                 <p className="stat-label">
@@ -145,7 +177,9 @@ export default function Trajectory() {
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">✅</span>
+              <span className="stat-icon">
+                <CheckCircle2 size={24} color="#07C980" />
+              </span>
               <div>
                 <p className="stat-label">
                   {lang==="en" ? "Approval Rate" : "Kadar Kelulusan"}
@@ -157,8 +191,8 @@ export default function Trajectory() {
 
           {/* Main trajectory chart */}
           <div className="card" style={{ marginBottom:20 }}>
-            <h2>
-              📈 {lang==="en"
+            <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <TrendingUp size={20} color="#065663" /> {lang==="en"
                 ? "Credit Score Over Time"
                 : "Skor Kredit Mengikut Masa"}
             </h2>
@@ -210,7 +244,9 @@ export default function Trajectory() {
           {/* Milestones */}
           {milestones.length > 0 && (
             <div className="card" style={{ marginBottom:20 }}>
-              <h2>🏅 {lang==="en" ? "Your Milestones" : "Pencapaian Anda"}</h2>
+              <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Medal size={20} color="#065663" /> {lang==="en" ? "Your Milestones" : "Pencapaian Anda"}
+              </h2>
               <div className="milestones-grid">
                 {milestones.map((m, i) => (
                   <div key={i} className="milestone-badge">
@@ -225,8 +261,8 @@ export default function Trajectory() {
           {/* Improvement tips based on latest score */}
           {latest && (
             <div className="card">
-              <h2>
-                💡 {lang==="en"
+              <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Lightbulb size={20} color="#065663" /> {lang==="en"
                   ? "Based on Your Latest Assessment"
                   : "Berdasarkan Penilaian Terkini Anda"}
               </h2>
@@ -254,13 +290,13 @@ export default function Trajectory() {
                           {tip.priority}
                         </span>
                         <div>
-                          <p className="tip-text">💡 {tip.tip}</p>
-                          <p className="tip-reason">📌 {tip.reason}</p>
+                          <p className="tip-text">{tip.tip}</p>
+                          <p className="tip-reason">{tip.reason}</p>
                         </div>
                       </div>
                     ))
-                    : <p className="good-msg">
-                        ✅ {lang==="en"
+                    : <p className="good-msg" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <CheckCircle2 size={16} color="#07C980" /> {lang==="en"
                           ? "Your profile looks strong — keep it up!"
                           : "Profil anda kelihatan kukuh — teruskan!"}
                       </p>

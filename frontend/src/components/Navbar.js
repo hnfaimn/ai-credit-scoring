@@ -3,6 +3,16 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { logoutUser } from "../firebase";
 import { STRINGS, t } from "../lang/strings";
+import { 
+  Zap, 
+  ClipboardList, 
+  TrendingUp, 
+  Wallet, 
+  ShieldCheck, 
+  User, 
+  LogOut,
+  Globe 
+} from "lucide-react";
 
 export default function Navbar() {
   const { user, profile, lang, toggleLang, isAdmin } = useAuth();
@@ -23,11 +33,11 @@ export default function Navbar() {
     location.pathname === path ? "bottom-tab active" : "bottom-tab";
 
   const navItems = [
-    { path:"/dashboard/assess",     icon:"⚡", label:t(s,"nav_assess") },
-    { path:"/dashboard/history",    icon:"📋", label:t(s,"nav_history") },
-    { path:"/dashboard/trajectory", icon:"📈", label:t(s,"nav_trajectory") },
-    { path:"/dashboard/finance",    icon:"💰", label:t(s,"nav_finance") },
-    ...(isAdmin ? [{ path:"/admin", icon:"🔧", label:t(s,"nav_admin") }] : []),
+    { path:"/dashboard/assess",     icon: <Zap size={18} />, label:t(s,"nav_assess") },
+    { path:"/dashboard/history",    icon: <ClipboardList size={18} />, label:t(s,"nav_history") },
+    { path:"/dashboard/trajectory", icon: <TrendingUp size={18} />, label:t(s,"nav_trajectory") },
+    { path:"/dashboard/finance",    icon: <Wallet size={18} />, label:t(s,"nav_finance") },
+    ...(isAdmin ? [{ path:"/admin", icon: <ShieldCheck size={18} />, label:t(s,"nav_admin") }] : []),
   ];
 
   if (!user) return null;
@@ -59,19 +69,19 @@ export default function Navbar() {
 
         {/* Right side — desktop */}
         <div className="nav-right">
-          <button className="lang-toggle" onClick={toggleLang}>
-            {lang === "en" ? "🇲🇾 BM" : "🇬🇧 EN"}
+          <button className="lang-toggle" onClick={toggleLang} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <Globe size={13} /> {lang === "en" ? "BM" : "EN"}
           </button>
           <div className="nav-user">
-            <span className="nav-user-name">
-              👤 {profile?.name || user.email}
+            <span className="nav-user-name" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <User size={15} /> {profile?.name || user.email}
             </span>
             <div className="nav-dropdown">
-              <Link to="/dashboard/profile" className="dropdown-item">
-                {t(s,"nav_profile")}
+              <Link to="/dashboard/profile" className="dropdown-item" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <User size={15} /> {t(s,"nav_profile")}
               </Link>
-              <button onClick={handleLogout} className="dropdown-item logout">
-                {t(s,"nav_logout")}
+              <button onClick={handleLogout} className="dropdown-item logout" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <LogOut size={15} /> {t(s,"nav_logout")}
               </button>
             </div>
           </div>
@@ -98,16 +108,16 @@ export default function Navbar() {
               </div>
             </div>
             <div className="mini-divider" />
-            <button className="mini-item" onClick={() => { toggleLang(); setMenuOpen(false); }}>
-              {lang === "en" ? "🇲🇾 Switch to BM" : "🇬🇧 Switch to EN"}
+            <button className="mini-item" onClick={() => { toggleLang(); setMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Globe size={16} /> {lang === "en" ? "Switch to BM" : "Switch to EN"}
             </button>
             <Link to="/dashboard/profile" className="mini-item"
-              onClick={() => setMenuOpen(false)}>
-              👤 {t(s,"nav_profile")}
+              onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <User size={16} /> {t(s,"nav_profile")}
             </Link>
             <div className="mini-divider" />
-            <button className="mini-item logout" onClick={handleLogout}>
-              🚪 {t(s,"nav_logout")}
+            <button className="mini-item logout" onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <LogOut size={16} /> {t(s,"nav_logout")}
             </button>
           </div>
         </>
