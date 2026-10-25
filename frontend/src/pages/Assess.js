@@ -713,7 +713,7 @@ export default function App() {
           {!result && !loading && (
             <div className="card placeholder">
               <div className="placeholder-icon">
-                <BarChart2 size={48} color="#07C980" strokeWidth={1.5} />
+                <BarChart3 size={48} color="#07C980" strokeWidth={1.5} />
               </div>
               <p>Complete the form and click <strong>Assess My Credit</strong> to
                 receive your credit score, AI explanation, and personalised financial tips.</p>
