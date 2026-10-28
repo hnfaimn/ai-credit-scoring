@@ -66,8 +66,8 @@ function validateForm(form) {
     errors.monthly_income = "Monthly income must be greater than 0.";
   if (!form.loan_amount || form.loan_amount <= 0)
     errors.loan_amount = "Loan amount must be greater than 0.";
-  if (!form.loan_duration || form.loan_duration < 1 || form.loan_duration > 84)
-    errors.loan_duration = "Loan duration must be between 1 and 84 months.";
+  if (!form.loan_duration || form.loan_duration < 1 || form.loan_duration > 108)
+    errors.loan_duration = "Loan duration must be between 1 and 108 months.";
   if (form.monthly_debt < 0)
     errors.monthly_debt = "Monthly debt cannot be negative.";
   if (form.savings < 0)
@@ -647,7 +647,7 @@ export default function App() {
                 </div>
                 <div className="field">
                   <label>Loan Duration <span className="hint">(months)</span></label>
-                  <input type="number" name="loan_duration" min="1" max="84"
+                  <input type="number" name="loan_duration" min="1" max="108"
                     className={fieldErrors.loan_duration ? "input-error" : ""}
                     value={form.loan_duration} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="loan_duration" />
@@ -816,28 +816,34 @@ export default function App() {
                   </div>
                 ))}
                 {result.explanations?.length > 0 && (
-                  <div style={{ marginTop:16 }}>
+                  <div style={{ marginTop: 16 }}>
                     <p className="chart-title">Feature Impact Chart</p>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <BarChart
-                        data={result.explanations.map(e=>({
-                          name:e.label, value:e.shap_val
-                        }))}
-                        layout="vertical"
-                        margin={{ left:20, right:20, top:5, bottom:5 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" />
-                        <YAxis type="category" dataKey="name"
-                          width={170} tick={{ fontSize:11 }} />
-                        <Tooltip formatter={(v)=>[`${v.toFixed(4)}`,"SHAP Impact"]} />
-                        <Bar dataKey="value" radius={4}>
-                          {result.explanations.map((e,i)=>(
-                            <Cell key={i}
-                              fill={e.shap_val>0 ? "#e74c3c" : "#2ecc71"} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
+                    <div className="chart-scroll-wrapper">
+                      <ResponsiveContainer width="100%" height={180}>
+                        <BarChart
+                          data={result.explanations.map(e => ({
+                            name: e.label, value: e.shap_val
+                          }))}
+                          layout="vertical"
+                          margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" tick={{ fontSize: 10 }} />
+                          <YAxis
+                            type="category"
+                            dataKey="name"
+                            width={130}
+                            tick={{ fontSize: 10 }}
+                          />
+                          <Tooltip formatter={(v) => [`${v.toFixed(4)}`, "SHAP Impact"]} />
+                          <Bar dataKey="value" radius={4}>
+                            {result.explanations.map((e, i) => (
+                              <Cell key={i}
+                                fill={e.shap_val > 0 ? "#e74c3c" : "#2ecc71"} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                     <p className="chart-note">
                       🟢 Green = reduces risk &nbsp;|&nbsp; 🔴 Red = increases risk
                     </p>

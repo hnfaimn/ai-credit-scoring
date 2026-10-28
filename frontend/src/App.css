@@ -1867,3 +1867,18 @@ p, span, input, select, td, th, li {
   transition: width 0.5s ease;
 }
 .factor-count { font-size: 11px; color: #888; }
+/* ── Responsive SHAP chart ── */
+@media (max-width: 768px) {
+  .recharts-wrapper,
+  .recharts-surface {
+    width: 100% !important;
+  }
+
+  /* Make chart container scrollable on mobile */
+  .chart-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -8px;
+    padding: 0 8px;
+  }
+}
