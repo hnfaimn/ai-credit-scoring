@@ -818,9 +818,11 @@ export default function App() {
                 {result.explanations?.length > 0 && (
                   <div style={{ marginTop: 16 }}>
                     <p className="chart-title">Feature Impact Chart</p>
-                    <div className="chart-scroll-wrapper">
-                      <ResponsiveContainer width="100%" height={180}>
+                    <div className="chart-scroll-wrapper" style={{ width: "100%", overflowX: "auto" }}>
+                      <div style={{ minWidth: 300, height: 200 }}>
                         <BarChart
+                          width={500}
+                          height={200}
                           data={result.explanations.map(e => ({
                             name: e.label, value: e.shap_val
                           }))}
@@ -842,7 +844,7 @@ export default function App() {
                             ))}
                           </Bar>
                         </BarChart>
-                      </ResponsiveContainer>
+                      </div>
                     </div>
                     <p className="chart-note">
                       🟢 Green = reduces risk &nbsp;|&nbsp; 🔴 Red = increases risk
