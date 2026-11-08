@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { logoutUser } from "../firebase";
@@ -10,7 +10,7 @@ import {
   Wallet, 
   ShieldCheck, 
   User, 
-  LogOut,
+  LogOut, 
   Globe 
 } from "lucide-react";
 
@@ -18,8 +18,21 @@ export default function Navbar() {
   const { user, profile, lang, toggleLang, isAdmin } = useAuth();
   const navigate        = useNavigate();
   const location        = useLocation();
-  const s               = STRINGS[lang];
+  const s               = STRINGS[lang] || STRINGS.en;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     await logoutUser();
@@ -72,15 +85,32 @@ export default function Navbar() {
           <button className="lang-toggle" onClick={toggleLang} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             <Globe size={13} /> {lang === "en" ? "BM" : "EN"}
           </button>
-          <div className="nav-user">
+          <div 
+            ref={dropdownRef}
+            className={`nav-user ${userDropdownOpen ? "open" : ""}`}
+            onClick={() => setUserDropdownOpen(prev => !prev)}
+          >
             <span className="nav-user-name" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
               <User size={15} /> {profile?.name || user.email}
             </span>
-            <div className="nav-dropdown">
-              <Link to="/dashboard/profile" className="dropdown-item" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className={`nav-dropdown ${userDropdownOpen ? "show" : ""}`}>
+              <Link 
+                to="/dashboard/profile" 
+                className="dropdown-item" 
+                onClick={() => setUserDropdownOpen(false)}
+                style={{ display: "flex", alignItems: "center", gap: 8 }}
+              >
                 <User size={15} /> {t(s,"nav_profile")}
               </Link>
-              <button onClick={handleLogout} className="dropdown-item logout" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setUserDropdownOpen(false);
+                  handleLogout();
+                }} 
+                className="dropdown-item logout" 
+                style={{ display: "flex", alignItems: "center", gap: 8 }}
+              >
                 <LogOut size={15} /> {t(s,"nav_logout")}
               </button>
             </div>
