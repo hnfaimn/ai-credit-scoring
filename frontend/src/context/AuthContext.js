@@ -7,9 +7,9 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+// ONLY the designated master administrator account
 export const ADMIN_EMAILS = [
-  "hanifaiman390@gmail.com",
-  "hanifdraco39@gmail.com"
+  "hanifaiman390@gmail.com"
 ];
 
 export const AuthProvider = ({ children }) => {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
             prof = {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
-              name: firebaseUser.displayName || (isMasterAdmin ? "Admin" : "User"),
+              name: firebaseUser.displayName || (isMasterAdmin ? "Admin" : "Applicant"),
               role: isMasterAdmin ? "admin" : "applicant",
               language: "en"
             };
@@ -42,11 +42,20 @@ export const AuthProvider = ({ children }) => {
               console.warn("Could not persist initial profile:", saveErr);
             }
           } else if (isMasterAdmin && prof.role !== "admin") {
+            // Ensure master admin always has role: "admin"
             prof = { ...prof, role: "admin" };
             try {
               await setDoc(doc(db, "users", firebaseUser.uid), { role: "admin" }, { merge: true });
             } catch (saveErr) {
               console.warn("Could not update admin role in Firestore:", saveErr);
+            }
+          } else if (!isMasterAdmin && prof.role === "admin") {
+            // Automatically reset non-admin accounts that previously got marked as admin
+            prof = { ...prof, role: "applicant" };
+            try {
+              await setDoc(doc(db, "users", firebaseUser.uid), { role: "applicant" }, { merge: true });
+            } catch (saveErr) {
+              console.warn("Could not reset role in Firestore:", saveErr);
             }
           }
 
@@ -79,14 +88,14 @@ export const AuthProvider = ({ children }) => {
 
   const emailLower = (user?.email || "").toLowerCase();
   const isMasterAdmin = ADMIN_EMAILS.some(e => e.toLowerCase() === emailLower);
-  const isAdmin = profile?.role === "admin" || isMasterAdmin;
+  const isAdmin = isMasterAdmin || profile?.role === "admin";
 
   return (
     <AuthContext.Provider value={{
       user, profile, loading, lang, toggleLang,
       isAdmin,
       isLoanOfficer  : profile?.role === "loan_officer",
-      isApplicant    : profile?.role === "applicant" && !isAdmin,
+      isApplicant    : !isAdmin,
     }}>
       {!loading && children}
     </AuthContext.Provider>
