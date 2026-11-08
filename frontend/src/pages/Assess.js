@@ -1,8 +1,9 @@
-import { useAuth } from "../context/AuthContext";
 import React, { useState, useRef } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
+import { useAuth } from "../context/AuthContext";
 import { saveAssessment } from "../firebase";
+import { STRINGS, t } from "../lang/strings";
 import {
   RadialBarChart, RadialBar, PolarAngleAxis,
   BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -12,8 +13,6 @@ import {
   User,
   DollarSign,
   Landmark,
-  ChartNoAxesCombined,
-  Zap,
   BarChart3,
   CheckCircle2,
   AlertCircle,
@@ -25,7 +24,6 @@ import {
   Play,
   Loader2
 } from "lucide-react";
-
 
 const API = "https://ai-credit-scoring-gurz.onrender.com";
 
@@ -58,33 +56,34 @@ const SIM_DEFAULTS = {
   loan_purpose     : "education",
 };
 
-function validateForm(form) {
+function validateForm(form, s) {
   const errors = {};
   if (!form.age || form.age < 18 || form.age > 80)
-    errors.age = "Age must be between 18 and 80.";
+    errors.age = t(s, "err_age");
   if (!form.monthly_income || form.monthly_income <= 0)
-    errors.monthly_income = "Monthly income must be greater than 0.";
+    errors.monthly_income = t(s, "err_income");
   if (!form.loan_amount || form.loan_amount <= 0)
-    errors.loan_amount = "Loan amount must be greater than 0.";
-  if (!form.loan_duration || form.loan_duration < 1 || form.loan_duration > 108)
-    errors.loan_duration = "Loan duration must be between 1 and 108 months.";
+    errors.loan_amount = t(s, "err_loan_amount");
+  if (!form.loan_duration || form.loan_duration < 1 || form.loan_duration > 84)
+    errors.loan_duration = t(s, "err_loan_duration");
   if (form.monthly_debt < 0)
-    errors.monthly_debt = "Monthly debt cannot be negative.";
+    errors.monthly_debt = t(s, "err_monthly_debt");
   if (form.savings < 0)
-    errors.savings = "Savings cannot be negative.";
+    errors.savings = t(s, "err_savings");
   if (form.credit_card_balance < 0)
-    errors.credit_card_balance = "Credit card balance cannot be negative.";
+    errors.credit_card_balance = t(s, "err_cc_balance");
   if (form.monthly_housing_payment < 0)
-    errors.monthly_housing_payment = "Housing payment cannot be negative.";
+    errors.monthly_housing_payment = t(s, "err_housing_payment");
   const totalDebt = form.monthly_debt + form.monthly_housing_payment;
   const dti = totalDebt / form.monthly_income;
   if (dti > 0.9)
-    errors.monthly_income = "Your debt-to-income ratio is extremely high. Please review your figures.";
+    errors.monthly_income = t(s, "err_dti_high");
   return errors;
 }
 
-export default function App() {
-  const { user } = useAuth();
+export default function Assess() {
+  const { user, lang }                = useAuth();
+  const s                             = STRINGS[lang] || STRINGS.en;
   const [form, setForm]               = useState(INITIAL_FORM);
   const [result, setResult]           = useState(null);
   const [loading, setLoading]         = useState(false);
@@ -108,7 +107,6 @@ export default function App() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (NUM_FIELDS.includes(name)) {
-    // Allow empty string while typing
       if (value === "" || value === "-") {
         setForm(f => ({ ...f, [name]: value }));
       } else {
@@ -135,35 +133,89 @@ export default function App() {
   };
 
   const riskLabel = (score) => {
-    if (score >= 70) return "🟢 Low Risk";
-    if (score >= 50) return "🟡 Medium Risk";
-    return "🔴 High Risk";
+    if (score >= 70) return t(s, "low_risk");
+    if (score >= 50) return t(s, "medium_risk");
+    return t(s, "high_risk");
   };
 
-  const totalMonthlyDebt = form.monthly_debt + form.monthly_housing_payment;
+  const totalMonthlyDebt = Number(form.monthly_debt || 0) + Number(form.monthly_housing_payment || 0);
   const dtiRatio = form.monthly_income > 0
     ? ((totalMonthlyDebt / form.monthly_income) * 100).toFixed(1) : 0;
   const dtiColor = dtiRatio <= 30 ? "#2ecc71"
     : dtiRatio <= 50 ? "#f39c12" : "#e74c3c";
-  const dtiLabel = dtiRatio <= 30 ? "Healthy ✅"
-    : dtiRatio <= 50 ? "Moderate ⚠️" : "High Risk 🔴";
+  const dtiLabel = dtiRatio <= 30 ? t(s, "dti_healthy")
+    : dtiRatio <= 50 ? t(s, "dti_moderate") : t(s, "dti_high_risk");
+
+  // Translation helpers for dynamic backend responses
+  const translateSentence = (exp) => {
+    if (!exp) return "";
+    if (lang !== "ms") return exp.sentence;
+    const labelMap = {
+      "checking account status": "status akaun semasa",
+      "loan duration": "tempoh pinjaman",
+      "credit amount requested": "jumlah kredit yang dipohon",
+      "savings account status": "status akaun simpanan",
+      "age": "umur",
+      "loan purpose": "tujuan pinjaman",
+      "housing situation": "situasi kediaman",
+      "gender": "jantina",
+      "job type": "jenis pekerjaan",
+      "repayment history": "sejarah pembayaran balik"
+    };
+    const bmLabel = labelMap[exp.label?.toLowerCase()] || exp.label;
+    const direction = exp.shap_val > 0 ? "meningkatkan" : "mengurangkan";
+    const absVal = Math.abs(exp.shap_val);
+    const strength = absVal > 0.5 ? "secara ketara" : absVal > 0.2 ? "secara sederhana" : "sedikit";
+    return `Faktor ${bmLabel} anda ${strength} ${direction} risiko kredit anda (impak: ${exp.shap_val > 0 ? "+" : ""}${exp.shap_val.toFixed(3)}).`;
+  };
+
+  const translateTip = (tip) => {
+    if (!tip || lang !== "ms") return tip;
+    const tipMap = {
+      "Open or maintain an active checking account with a positive balance.": "Buka atau kekalkan akaun semasa yang aktif dengan baki positif.",
+      "Consider applying for a shorter loan duration.": "Pertimbangkan untuk memohon tempoh pinjaman yang lebih pendek.",
+      "Apply for a lower credit amount relative to your income.": "Mohon jumlah kredit yang lebih rendah berbanding pendapatan anda.",
+      "Build up your savings before reapplying.": "Tingkatkan simpanan anda sebelum memohon semula.",
+      "Build a credit history through smaller loans first.": "Bina sejarah kredit melalui pinjaman kecil terlebih dahulu.",
+      "Essential loan purposes are viewed more favourably.": "Tujuan pinjaman keperluan dinilai dengan lebih baik.",
+      "Property ownership improves your credit profile.": "Pemilikan hartanah menambah baik profil kredit anda.",
+      "Stable skilled employment improves your credit profile.": "Pekerjaan mahir yang stabil menambah baik profil kredit anda."
+    };
+    const reasonMap = {
+      "Checking account status is the strongest predictor of credit risk.": "Status akaun semasa adalah peramal paling kuat bagi risiko kredit.",
+      "Longer durations increase repayment risk.": "Tempoh pinjaman yang lebih lama meningkatkan risiko pembayaran balik.",
+      "Higher amounts increase default risk.": "Jumlah pinjaman yang lebih tinggi meningkatkan risiko keingkaran.",
+      "Low savings indicates financial vulnerability.": "Simpanan yang rendah menunjukkan kerentanan kewangan.",
+      "Age reflects financial experience and stability.": "Umur mencerminkan pengalaman dan kestabilan kewangan.",
+      "Loan purpose is associated with repayment intent.": "Tujuan pinjaman dikaitkan dengan niat pembayaran balik.",
+      "Housing stability indicates financial responsibility.": "Kestabilan kediaman menunjukkan tanggungjawab kewangan.",
+      "Employment type reflects repayment reliability.": "Jenis pekerjaan mencerminkan kebolehpercayaan pembayaran balik."
+    };
+    return {
+      ...tip,
+      tip: tipMap[tip.tip] || tip.tip,
+      reason: reasonMap[tip.reason] || tip.reason,
+      priorityLabel: tip.priority === "High" ? t(s, "high_priority")
+        : tip.priority === "Medium" ? t(s, "medium_priority") : t(s, "low_priority")
+    };
+  };
 
   // ── Submit ────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    const errors = validateForm(form);
+    const errors = validateForm(form, s);
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      setError("Please fix the errors above before submitting.");
+      setError(t(s, "err_fix_errors"));
       return;
     }
     setLoading(true); setError(null); setResult(null);
     setSimResult(null); setFieldErrors({}); setSavedId(null);
 
-   // Wake up Render first
+    // Wake up Render first
     try {
       await axios.get(`${API}/health`, { timeout: 60000 });
     } catch {
-    // ignore, just waking up
+      // ignore, just waking up
     }
 
     try {
@@ -175,7 +227,7 @@ export default function App() {
         resultRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 300);
     } catch {
-      setError("Unable to connect — make sure the Flask server is running.");
+      setError(t(s, "err_server_conn"));
     } finally {
       setLoading(false);
     }
@@ -192,13 +244,11 @@ export default function App() {
       }, { timeout: 60000 });
       setSimResult(res.data);
     } catch {
-      setError("Simulation failed — make sure Flask is running.");
+      setError(t(s, "err_sim_failed"));
     } finally {
       setLoading(false);
     }
   };
-
-
 
   // ── Export PDF ────────────────────────────────────────────────────────
   const handleExportPDF = async () => {
@@ -251,53 +301,34 @@ export default function App() {
       };
 
       const divider = () => {
-        checkY(4);
-        pdf.setDrawColor(220, 227, 240);
+        pdf.setDrawColor(220, 225, 235);
         pdf.line(10, y, pdfW - 10, y);
         y += 4;
       };
 
-      // Header
+      // Header Banner
       pdf.setFillColor(27, 58, 107);
-      pdf.rect(0, 0, pdfW, 28, "F");
+      pdf.rect(0, 0, pdfW, 26, "F");
       pdf.setFillColor(245, 166, 35);
-      pdf.rect(0, 28, pdfW, 2, "F");
+      pdf.rect(0, 25, pdfW, 2, "F");
       pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(18);
+      pdf.setFontSize(15);
       pdf.setFont("helvetica", "bold");
-      pdf.text("AI Credit Scoring Report", 14, 14);
-      pdf.setFontSize(9);
+      pdf.text("CrediWise — Credit Assessment Report", 14, 12);
+      pdf.setFontSize(8.5);
       pdf.setFont("helvetica", "normal");
-      pdf.text(
-        "Explainable AI-Based Credit Assessment & Financial Recommendation",
-        14, 22);
-      pdf.text(`Generated: ${new Date().toLocaleString()}`,
-        pdfW - 14, 22, { align: "right" });
+      pdf.text("Explainable AI-Based Pre-Approval & Risk Evaluation", 14, 18);
+      pdf.setFontSize(8);
+      pdf.text(new Date().toLocaleDateString("en-MY", {
+        day: "numeric", month: "long", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      }), pdfW - 14, 18, { align: "right" });
+
       y = 36;
 
-      // Section 1: Result
-      sectionTitle("CREDIT ASSESSMENT RESULT");
-      const approved = result.decision === "Approved";
-      pdf.setFillColor(
-        approved ? 213 : 250,
-        approved ? 245 : 219,
-        approved ? 227 : 216
-      );
-      pdf.rect(10, y, pdfW - 20, 14, "F");
-      pdf.setFontSize(14);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(
-        approved ? 30  : 192,
-        approved ? 132 : 57,
-        approved ? 73  : 43
-      );
-      pdf.text(
-        approved ? "APPROVED" : "REJECTED",
-        pdfW / 2, y + 9, { align: "center" }
-      );
-      y += 18;
-      pdf.setTextColor(30, 30, 50);
-      row("Credit Score",         `${result.credit_score} / 100`, true);
+      // Section 1: Executive Summary
+      sectionTitle("EXECUTIVE SUMMARY");
+      row("Assessment Decision", result.decision?.toUpperCase() === "APPROVED" ? "APPROVED" : "REJECTED", true);
       row("Approval Probability", `${result.credit_score}%`);
       row("Risk Classification",
         result.credit_score >= 70 ? "Low Risk"
@@ -309,39 +340,39 @@ export default function App() {
           : "N/A", true);
       divider(); y += 2;
 
-      // Section 2: Applicant
+      // Section 2: Applicant Information
       sectionTitle("APPLICANT INFORMATION");
-      row("Age",                    `${form.age} years`, true);
-      row("Gender",                 form.gender === "male" ? "Male" : "Female");
-      row("Employment Status",      form.employment_status.replace("_"," "), true);
-      row("Employment Type",        form.employment_type.replace("_"," "));
-      row("Employment Duration",    `${form.employment_duration} months`, true);
-      row("Monthly Net Income",     `RM ${form.monthly_income.toLocaleString()}`);
-      row("Number of Dependents",   String(form.dependents), true);
-      row("Housing Status",         form.housing_status);
-      row("Monthly Housing Payment",`RM ${form.monthly_housing_payment.toLocaleString()}`, true);
+      row("Age", `${form.age} years`, true);
+      row("Gender", form.gender === "male" ? "Male" : "Female");
+      row("Employment Status", form.employment_status.replace("_"," "), true);
+      row("Employment Type", form.employment_type.replace("_"," "));
+      row("Employment Duration", `${form.employment_duration} months`, true);
+      row("Monthly Net Income", `RM ${Number(form.monthly_income || 0).toLocaleString()}`);
+      row("Number of Dependents", String(form.dependents), true);
+      row("Housing Status", form.housing_status);
+      row("Monthly Housing Payment", `RM ${Number(form.monthly_housing_payment || 0).toLocaleString()}`, true);
       divider(); y += 2;
 
-      // Section 3: Financial
+      // Section 3: Financial Information
       sectionTitle("FINANCIAL & CREDIT INFORMATION");
-      row("Monthly Debt Commitments", `RM ${form.monthly_debt.toLocaleString()}`, true);
-      row("Outstanding Financing",    `RM ${form.outstanding_financing.toLocaleString()}`);
-      row("Credit Card Balance",      `RM ${form.credit_card_balance.toLocaleString()}`, true);
-      row("Credit Card Limit",        `RM ${form.credit_card_limit.toLocaleString()}`);
-      row("Total Savings",            `RM ${form.savings.toLocaleString()}`, true);
-      row("Repayment History",        form.repayment_history);
+      row("Monthly Debt Commitments", `RM ${Number(form.monthly_debt || 0).toLocaleString()}`, true);
+      row("Outstanding Financing", `RM ${Number(form.outstanding_financing || 0).toLocaleString()}`);
+      row("Credit Card Balance", `RM ${Number(form.credit_card_balance || 0).toLocaleString()}`, true);
+      row("Credit Card Limit", `RM ${Number(form.credit_card_limit || 0).toLocaleString()}`);
+      row("Total Savings", `RM ${Number(form.savings || 0).toLocaleString()}`, true);
+      row("Repayment History", form.repayment_history);
       divider(); y += 2;
 
-      // Section 4: Loan
+      // Section 4: Loan Details
       sectionTitle("LOAN APPLICATION DETAILS");
-      row("Loan Amount Requested",    `RM ${form.loan_amount.toLocaleString()}`, true);
-      row("Loan Duration",            `${form.loan_duration} months`);
-      row("Loan Purpose",             form.loan_purpose, true);
+      row("Loan Amount Requested", `RM ${Number(form.loan_amount || 0).toLocaleString()}`, true);
+      row("Loan Duration", `${form.loan_duration} months`);
+      row("Loan Purpose", form.loan_purpose, true);
       row("Estimated Monthly Payment",
         `RM ${Math.round(form.loan_amount / form.loan_duration).toLocaleString()}`);
       divider(); y += 2;
 
-      // Section 5: Explanation
+      // Section 5: Explanations
       sectionTitle("AI EXPLANATION — WHY THIS DECISION?");
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8.5);
@@ -356,17 +387,9 @@ export default function App() {
       result.explanations?.forEach((exp, i) => {
         checkY(20);
         const isRisk = exp.shap_val > 0;
-        pdf.setFillColor(
-          isRisk ? 253 : 240,
-          isRisk ? 237 : 253,
-          isRisk ? 236 : 244
-        );
+        pdf.setFillColor(isRisk ? 253 : 240, isRisk ? 237 : 253, isRisk ? 236 : 244);
         pdf.rect(10, y, pdfW - 20, 16, "F");
-        pdf.setFillColor(
-          isRisk ? 231 : 46,
-          isRisk ? 76  : 204,
-          isRisk ? 60  : 113
-        );
+        pdf.setFillColor(isRisk ? 231 : 46, isRisk ? 76 : 204, isRisk ? 60 : 113);
         pdf.rect(10, y, 3, 16, "F");
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(8.5);
@@ -412,14 +435,6 @@ export default function App() {
           pdf.text(reasonLines, 14, y + 10 + tipLines.length * 4);
           y += 26;
         });
-      } else {
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(30, 132, 73);
-        pdf.text(
-          "Your financial profile looks strong — keep maintaining good habits!",
-          14, y);
-        y += 10;
       }
 
       // Footer
@@ -431,27 +446,26 @@ export default function App() {
         pdf.setFontSize(7.5);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(27, 58, 107);
-        pdf.text("Confidential — AI Credit Assessment Report",
-          14, pdfH - 3.5);
-        pdf.text(`Page ${p} of ${totalPages}`,
-          pdfW - 14, pdfH - 3.5, { align: "right" });
+        pdf.text("Confidential — AI Credit Assessment Report", 14, pdfH - 3.5);
+        pdf.text(`Page ${p} of ${totalPages}`, pdfW - 14, pdfH - 3.5, { align: "right" });
       }
 
       pdf.save(`credit_report_${Date.now()}.pdf`);
 
     } catch (err) {
       console.error(err);
-      setError("PDF export failed. Please try again.");
+      setError(t(s, "err_pdf_failed"));
     } finally {
       setExportLoading(false);
     }
   };
 
-  const Tab = ({ id, icon: Icon, label }) => (
+  const Tab = ({ id, label, icon: IconComponent }) => (
     <button
       className={`tab-btn ${activeSection === id ? "active" : ""}`}
-      onClick={() => setActiveSection(id)}>
-        {Icon && <Icon size={15} style={{ marginRight: 5 }} />}
+      onClick={() => setActiveSection(id)}
+      style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+      {IconComponent && <IconComponent size={16} />}
       {label}
     </button>
   );
@@ -463,19 +477,18 @@ export default function App() {
 
   return (
     <div className="app">
-
       <div className="main">
 
         {/* ══ LEFT: FORM ══ */}
         <div className="card form-card">
-          <h2>Loan Application Form</h2>
-          <p className="form-hint">Complete all sections for an accurate assessment.</p>
+          <h2>{t(s, "form_title")}</h2>
+          <p className="form-hint">{t(s, "form_hint")}</p>
 
           {/* DTI Banner */}
           {form.monthly_income > 0 && (
             <div className="dti-banner" style={{ borderColor: dtiColor }}>
               <div className="dti-info">
-                <span className="dti-label">Debt-to-Income Ratio</span>
+                <span className="dti-label">{t(s, "dti_title")}</span>
                 <span className="dti-value" style={{ color: dtiColor }}>
                   {dtiRatio}% — {dtiLabel}
                 </span>
@@ -485,85 +498,85 @@ export default function App() {
                   style={{ width:`${Math.min(100, dtiRatio)}%`, background:dtiColor }} />
               </div>
               <p className="dti-note">
-                Total monthly debt: RM {totalMonthlyDebt.toLocaleString()} /
-                Income: RM {form.monthly_income.toLocaleString()}
-                &nbsp;(Ideal: below 30%)
+                {t(s, "dti_total_debt")}: RM {totalMonthlyDebt.toLocaleString()} /{" "}
+                {t(s, "dti_income")}: RM {Number(form.monthly_income || 0).toLocaleString()}
+                &nbsp;({t(s, "dti_ideal")})
               </p>
             </div>
           )}
 
           <div className="tabs">
-            <Tab id="applicant" icon={User} label="Applicant" />
-            <Tab id="financial" icon={DollarSign} label="Financial" />
-            <Tab id="loan" icon={Landmark}     label="Loan" />
+            <Tab id="applicant" icon={User} label={t(s, "tab_applicant")} />
+            <Tab id="financial" icon={DollarSign} label={t(s, "tab_financial")} />
+            <Tab id="loan" icon={Landmark} label={t(s, "tab_loan")} />
           </div>
 
-          {/* Tab 1 */}
+          {/* Tab 1: Applicant Information */}
           {activeSection === "applicant" && (
             <div className="form-section">
-              <div className="section-label">Applicant Information</div>
+              <div className="section-label">{t(s, "sec_applicant")}</div>
               <div className="form-grid">
                 <div className="field">
-                  <label>Age <span className="hint">(years)</span></label>
+                  <label>{t(s, "lbl_age")} <span className="hint">({t(s, "lbl_years")})</span></label>
                   <input type="number" name="age" min="18" max="80"
                     className={fieldErrors.age ? "input-error" : ""}
                     value={form.age} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="age" />
                 </div>
                 <div className="field">
-                  <label>Gender</label>
+                  <label>{t(s, "lbl_gender")}</label>
                   <select name="gender" value={form.gender} onChange={handleChange}>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="male">{t(s, "opt_male")}</option>
+                    <option value="female">{t(s, "opt_female")}</option>
                   </select>
                 </div>
                 <div className="field">
-                  <label>Employment Status</label>
+                  <label>{t(s, "lbl_emp_status")}</label>
                   <select name="employment_status" value={form.employment_status}
                     onChange={handleChange}>
-                    <option value="employed">Employed</option>
-                    <option value="self_employed">Self-Employed</option>
-                    <option value="unemployed">Unemployed</option>
-                    <option value="retired">Retired</option>
+                    <option value="employed">{t(s, "opt_employed")}</option>
+                    <option value="self_employed">{t(s, "opt_self_employed")}</option>
+                    <option value="unemployed">{t(s, "opt_unemployed")}</option>
+                    <option value="retired">{t(s, "opt_retired")}</option>
                   </select>
                 </div>
                 <div className="field">
-                  <label>Employment Type</label>
+                  <label>{t(s, "lbl_emp_type")}</label>
                   <select name="employment_type" value={form.employment_type}
                     onChange={handleChange}>
-                    <option value="highly_skilled">Highly Skilled / Management</option>
-                    <option value="skilled">Skilled Employee</option>
-                    <option value="unskilled">Unskilled</option>
+                    <option value="highly_skilled">{t(s, "opt_highly_skilled")}</option>
+                    <option value="skilled">{t(s, "opt_skilled")}</option>
+                    <option value="unskilled">{t(s, "opt_unskilled")}</option>
                   </select>
                 </div>
                 <div className="field">
-                  <label>Employment Duration <span className="hint">(months)</span></label>
+                  <label>{t(s, "lbl_emp_duration")} <span className="hint">({t(s, "lbl_months")})</span></label>
                   <input type="number" name="employment_duration" min="0"
                     value={form.employment_duration} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
-                  <label>Monthly Net Income <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_monthly_income")} <span className="hint">(RM)</span></label>
                   <input type="number" name="monthly_income" min="0"
                     className={fieldErrors.monthly_income ? "input-error" : ""}
                     value={form.monthly_income} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="monthly_income" />
                 </div>
                 <div className="field">
-                  <label>Number of Dependents</label>
+                  <label>{t(s, "lbl_dependents")}</label>
                   <input type="number" name="dependents" min="0" max="10"
                     value={form.dependents} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
-                  <label>Housing Status</label>
+                  <label>{t(s, "lbl_housing_status")}</label>
                   <select name="housing_status" value={form.housing_status}
                     onChange={handleChange}>
-                    <option value="own">Own Property</option>
-                    <option value="rent">Renting</option>
-                    <option value="free">Living Rent-Free</option>
+                    <option value="own">{t(s, "opt_housing_own")}</option>
+                    <option value="rent">{t(s, "opt_housing_rent")}</option>
+                    <option value="free">{t(s, "opt_housing_free")}</option>
                   </select>
                 </div>
                 <div className="field full">
-                  <label>Monthly Housing Payment <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_housing_payment")} <span className="hint">(RM)</span></label>
                   <input type="number" name="monthly_housing_payment" min="0"
                     className={fieldErrors.monthly_housing_payment ? "input-error":""}
                     value={form.monthly_housing_payment} onChange={handleChange} onFocus={e => e.target.select()} />
@@ -572,116 +585,116 @@ export default function App() {
               </div>
               <button className="btn-next"
                 onClick={() => setActiveSection("financial")}>
-                Next: Financial Info →
+                {t(s, "btn_next_financial")}
               </button>
             </div>
           )}
 
-          {/* Tab 2 */}
+          {/* Tab 2: Financial Information */}
           {activeSection === "financial" && (
             <div className="form-section">
-              <div className="section-label">Financial &amp; Credit Information</div>
+              <div className="section-label">{t(s, "sec_financial")}</div>
               <div className="form-grid">
                 <div className="field">
-                  <label>Monthly Debt Commitments <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_monthly_debt")} <span className="hint">(RM)</span></label>
                   <input type="number" name="monthly_debt" min="0"
                     className={fieldErrors.monthly_debt ? "input-error" : ""}
                     value={form.monthly_debt} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="monthly_debt" />
                 </div>
                 <div className="field">
-                  <label>Outstanding Financing <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_outstanding_financing")} <span className="hint">(RM)</span></label>
                   <input type="number" name="outstanding_financing" min="0"
                     value={form.outstanding_financing} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
-                  <label>Credit Card Balance <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_cc_balance")} <span className="hint">(RM)</span></label>
                   <input type="number" name="credit_card_balance" min="0"
                     className={fieldErrors.credit_card_balance ? "input-error":""}
                     value={form.credit_card_balance} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="credit_card_balance" />
                 </div>
                 <div className="field">
-                  <label>Credit Card Limit <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_cc_limit")} <span className="hint">(RM)</span></label>
                   <input type="number" name="credit_card_limit" min="0"
                     value={form.credit_card_limit} onChange={handleChange} onFocus={e => e.target.select()} />
                 </div>
                 <div className="field">
-                  <label>Total Savings <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_savings")} <span className="hint">(RM)</span></label>
                   <input type="number" name="savings" min="0"
                     className={fieldErrors.savings ? "input-error" : ""}
                     value={form.savings} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="savings" />
                 </div>
                 <div className="field">
-                  <label>Repayment History</label>
+                  <label>{t(s, "lbl_repayment_history")}</label>
                   <select name="repayment_history" value={form.repayment_history}
                     onChange={handleChange}>
-                    <option value="excellent">Excellent — No missed payments</option>
-                    <option value="good">Good — Rarely missed</option>
-                    <option value="fair">Fair — Occasionally missed</option>
-                    <option value="poor">Poor — Frequently missed</option>
+                    <option value="excellent">{t(s, "opt_rep_excellent")}</option>
+                    <option value="good">{t(s, "opt_rep_good")}</option>
+                    <option value="fair">{t(s, "opt_rep_fair")}</option>
+                    <option value="poor">{t(s, "opt_rep_poor")}</option>
                   </select>
                 </div>
               </div>
               <div className="btn-row">
                 <button className="btn-back"
-                  onClick={() => setActiveSection("applicant")}>← Back</button>
+                  onClick={() => setActiveSection("applicant")}>{t(s, "btn_back")}</button>
                 <button className="btn-next"
-                  onClick={() => setActiveSection("loan")}>Next: Loan Details →</button>
+                  onClick={() => setActiveSection("loan")}>{t(s, "btn_next_loan")}</button>
               </div>
             </div>
           )}
 
-          {/* Tab 3 */}
+          {/* Tab 3: Loan Application */}
           {activeSection === "loan" && (
             <div className="form-section">
-              <div className="section-label">Loan Application</div>
+              <div className="section-label">{t(s, "sec_loan")}</div>
               <div className="form-grid">
                 <div className="field">
-                  <label>Loan Amount <span className="hint">(RM)</span></label>
+                  <label>{t(s, "lbl_loan_amount")} <span className="hint">(RM)</span></label>
                   <input type="number" name="loan_amount" min="100"
                     className={fieldErrors.loan_amount ? "input-error" : ""}
                     value={form.loan_amount} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="loan_amount" />
                 </div>
                 <div className="field">
-                  <label>Loan Duration <span className="hint">(months)</span></label>
-                  <input type="number" name="loan_duration" min="1" max="108"
+                  <label>{t(s, "lbl_loan_duration")} <span className="hint">({t(s, "lbl_months")})</span></label>
+                  <input type="number" name="loan_duration" min="1" max="84"
                     className={fieldErrors.loan_duration ? "input-error" : ""}
                     value={form.loan_duration} onChange={handleChange} onFocus={e => e.target.select()} />
                   <FieldError name="loan_duration" />
                 </div>
                 <div className="field full">
-                  <label>Loan Purpose</label>
+                  <label>{t(s, "lbl_loan_purpose")}</label>
                   <select name="loan_purpose" value={form.loan_purpose}
                     onChange={handleChange}>
-                    <option value="car">Purchase a Car</option>
-                    <option value="furniture/equipment">Furniture / Home Equipment</option>
-                    <option value="education">Education</option>
-                    <option value="business">Business</option>
-                    <option value="repairs">Home Repairs</option>
-                    <option value="vacation/others">Vacation / Others</option>
+                    <option value="car">{t(s, "purpose_car")}</option>
+                    <option value="furniture/equipment">{t(s, "purpose_furniture")}</option>
+                    <option value="education">{t(s, "purpose_education")}</option>
+                    <option value="business">{t(s, "purpose_business")}</option>
+                    <option value="repairs">{t(s, "purpose_repairs")}</option>
+                    <option value="vacation/others">{t(s, "purpose_vacation")}</option>
                   </select>
                 </div>
                 <div className="field full">
                   <div className="loan-summary">
                     <div className="loan-sum-item">
-                      <span>Loan Amount</span>
-                      <strong>RM {form.loan_amount.toLocaleString()}</strong>
+                      <span>{t(s, "sum_loan_amount")}</span>
+                      <strong>RM {Number(form.loan_amount || 0).toLocaleString()}</strong>
                     </div>
                     <div className="loan-sum-item">
-                      <span>Duration</span>
-                      <strong>{form.loan_duration} months</strong>
+                      <span>{t(s, "sum_duration")}</span>
+                      <strong>{form.loan_duration} {t(s, "lbl_months")}</strong>
                     </div>
                     <div className="loan-sum-item">
-                      <span>Est. Monthly Payment</span>
+                      <span>{t(s, "sum_est_monthly")}</span>
                       <strong>
                         RM {Math.round(form.loan_amount / form.loan_duration).toLocaleString()}
                       </strong>
                     </div>
                     <div className="loan-sum-item">
-                      <span>Loan-to-Income Ratio</span>
+                      <span>{t(s, "sum_lti")}</span>
                       <strong style={{
                         color: (form.loan_amount / form.monthly_income) <= 10
                           ? "#2ecc71" : "#e74c3c"
@@ -696,36 +709,33 @@ export default function App() {
               </div>
               <div className="btn-row">
                 <button className="btn-back"
-                  onClick={() => setActiveSection("financial")}>← Back</button>
+                  onClick={() => setActiveSection("financial")}>{t(s, "btn_back")}</button>
                 <button className="btn-primary"
                   onClick={handleSubmit} disabled={loading}>
-                  {loading ? "⏳ Analysing..." : "⚡ Assess My Credit"}
+                  {loading ? t(s, "btn_analysing") : t(s, "assess_btn")}
                 </button>
               </div>
             </div>
           )}
 
-          {error && <p className="error">⚠️ {error}</p>}
+          {error && <p className="error" style={{ display: "flex", alignItems: "center", gap: 6 }}><AlertCircle size={16} /> {error}</p>}
         </div>
 
         {/* ══ RIGHT: RESULTS ══ */}
         <div className="results">
           {!result && !loading && (
             <div className="card placeholder">
-              <div className="placeholder-icon">
-                <BarChart3 size={48} color="#07C980" strokeWidth={1.5} />
-              </div>
-              <p>Complete the form and click <strong>Assess My Credit</strong> to
-                receive your credit score, AI explanation, and personalised financial tips.</p>
+              <div className="placeholder-icon"><BarChart3 size={40} color="#065663" /></div>
+              <p>{t(s, "placeholder_text")}</p>
             </div>
           )}
 
           {loading && (
             <div className="card placeholder">
-              <div className="placeholder-icon spinning">⏳</div>
-              <p>Analysing your profile, please wait...</p>
+              <div className="placeholder-icon spinning"><Loader2 size={40} color="#065663" /></div>
+              <p>{t(s, "loading_profile")}</p>
               <p className="section-hint" style={{ marginTop: 8 }}>
-                First request may take up to 60 seconds to wake the server.
+                {t(s, "loading_hint")}
               </p>
             </div>
           )}
@@ -736,23 +746,21 @@ export default function App() {
               {/* Export + History bar */}
               <div className="export-bar">
                 <span className="export-label">
-                  📄 Assessment complete
+                  {t(s, "assessment_complete")}
                   {savedId &&
-                    <span className="saved-badge">✅ Saved to cloud</span>}
+                    <span className="saved-badge" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><CheckCircle2 size={13} /> {t(s, "saved_to_cloud")}</span>}
                 </span>
                 <div className="export-btns">
                   <button className="btn-export"
                     onClick={handleExportPDF} disabled={exportLoading}>
-                    {exportLoading ? "⏳ Exporting..." : "⬇️ Export PDF"}
+                    {exportLoading ? <><Loader2 size={14} className="spinning" /> {t(s, "btn_exporting")}</> : <><Download size={14} /> {t(s, "btn_export_pdf")}</>}
                   </button>
                 </div>
               </div>
 
-            
-
               {/* Score Card */}
               <div className="card score-card">
-                <h2>Credit Assessment Result</h2>
+                <h2>{t(s, "result_title")}</h2>
                 <div className="score-layout">
                   <div className="gauge">
                     <RadialBarChart
@@ -774,22 +782,22 @@ export default function App() {
                   </div>
                   <div className="decision-info">
                     <div className={`badge ${result.decision==="Approved"?"green":"red"}`}>
-                      {result.decision==="Approved" ? "✅ APPROVED" : "❌ REJECTED"}
+                      {result.decision==="Approved" ? <><Check size={16} /> {t(s, "approved")}</> : <><X size={16} /> {t(s, "rejected")}</>}
                     </div>
-                    <p><strong>Approval Probability:</strong> {result.credit_score}%</p>
-                    <p><strong>Risk Class:</strong> {riskLabel(result.credit_score)}</p>
-                    <p><strong>Debt-to-Income:</strong>{" "}
+                    <p><strong>{t(s, "approval_prob")}:</strong> {result.credit_score}%</p>
+                    <p><strong>{t(s, "risk_class")}:</strong> {riskLabel(result.credit_score)}</p>
+                    <p><strong>{t(s, "dti_title")}:</strong>{" "}
                       <span style={{ color:dtiColor, fontWeight:600 }}>
                         {dtiRatio}% ({dtiLabel})
                       </span>
                     </p>
-                    <p><strong>Loan-to-Income:</strong>{" "}
+                    <p><strong>{t(s, "sum_lti")}:</strong>{" "}
                       {form.monthly_income > 0
                         ? `${(form.loan_amount/form.monthly_income).toFixed(1)}x`
                         : "—"}
                     </p>
                     <p className="score-note">
-                      Score above 50% = eligible for approval consideration.
+                      {t(s, "score_eligible_note")}
                     </p>
                   </div>
                 </div>
@@ -797,9 +805,9 @@ export default function App() {
 
               {/* Explanations */}
               <div className="card">
-                <h2>Why Was This Decision Made?</h2>
+                <h2>{t(s, "why_title")}</h2>
                 <p className="section-hint">
-                  Top factors our AI identified that influenced your result.
+                  {t(s, "why_hint")}
                 </p>
                 {result.explanations?.map((exp, i) => (
                   <div key={i} className="explanation-item">
@@ -807,47 +815,39 @@ export default function App() {
                       background : exp.shap_val > 0 ? "#e74c3c22" : "#2ecc7122",
                       borderLeft : `4px solid ${exp.shap_val>0 ? "#e74c3c" : "#2ecc71"}`
                     }}>
-                      <p className="exp-sentence">{exp.sentence}</p>
+                      <p className="exp-sentence">{translateSentence(exp)}</p>
                       <span className="exp-badge"
                         style={{ background: exp.shap_val>0 ? "#e74c3c" : "#2ecc71" }}>
-                        {exp.shap_val>0 ? "↑ Increases Risk" : "↓ Reduces Risk"}
+                        {exp.shap_val>0 ? `↑ ${t(s, "increases_risk")}` : `↓ ${t(s, "reduces_risk")}`}
                       </span>
                     </div>
                   </div>
                 ))}
                 {result.explanations?.length > 0 && (
-                  <div style={{ marginTop: 16 }}>
-                    <p className="chart-title">Feature Impact Chart</p>
-                    <div className="chart-scroll-wrapper" style={{ width: "100%", overflowX: "auto" }}>
-                      <div style={{ minWidth: 300, height: 200 }}>
-                        <BarChart
-                          width={500}
-                          height={200}
-                          data={result.explanations.map(e => ({
-                            name: e.label, value: e.shap_val
-                          }))}
-                          layout="vertical"
-                          margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis type="number" tick={{ fontSize: 10 }} />
-                          <YAxis
-                            type="category"
-                            dataKey="name"
-                            width={130}
-                            tick={{ fontSize: 10 }}
-                          />
-                          <Tooltip formatter={(v) => [`${v.toFixed(4)}`, "SHAP Impact"]} />
-                          <Bar dataKey="value" radius={4}>
-                            {result.explanations.map((e, i) => (
-                              <Cell key={i}
-                                fill={e.shap_val > 0 ? "#e74c3c" : "#2ecc71"} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </div>
-                    </div>
+                  <div style={{ marginTop:16 }}>
+                    <p className="chart-title">{t(s, "chart_title")}</p>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart
+                        data={result.explanations.map(e=>({
+                          name: e.label, value: e.shap_val
+                        }))}
+                        layout="vertical"
+                        margin={{ left:20, right:20, top:5, bottom:5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis type="category" dataKey="name"
+                          width={170} tick={{ fontSize:11 }} />
+                        <Tooltip formatter={(v)=>[`${Number(v).toFixed(4)}`,"SHAP Impact"]} />
+                        <Bar dataKey="value" radius={4}>
+                          {result.explanations.map((e,i)=>(
+                            <Cell key={i}
+                              fill={e.shap_val>0 ? "#e74c3c" : "#2ecc71"} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
                     <p className="chart-note">
-                      🟢 Green = reduces risk &nbsp;|&nbsp; 🔴 Red = increases risk
+                      <span style={{ display:"inline-block", width:8, height:8, borderRadius:"50%", background:"#2ecc71", marginRight:4 }} /> {t(s, "chart_legend_green")} &nbsp;|&nbsp; <span style={{ display:"inline-block", width:8, height:8, borderRadius:"50%", background:"#e74c3c", marginRight:4 }} /> {t(s, "chart_legend_red")}
                     </p>
                   </div>
                 )}
@@ -855,55 +855,57 @@ export default function App() {
 
               {/* Recommendations */}
               <div className="card">
-                <h2>💡 How to Improve Your Score</h2>
+                <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}><Lightbulb size={20} color="#065663" /> {t(s, "improve_title")}</h2>
                 <p className="section-hint">
-                  Personalised steps based on your financial profile.
+                  {t(s, "improve_hint")}
                 </p>
                 {result.recommendations?.length > 0
-                  ? result.recommendations.map((tip,i) => (
-                    <div key={i} className="tip-item">
-                      <span className={`priority priority-${tip.priority.toLowerCase()}`}>
-                        {tip.priority} Priority
-                      </span>
-                      <div>
-                        <p className="tip-text">💡 {tip.tip}</p>
-                        <p className="tip-reason">📌 Why: {tip.reason}</p>
+                  ? result.recommendations.map((rawTip, i) => {
+                    const tip = translateTip(rawTip);
+                    return (
+                      <div key={i} className="tip-item">
+                        <span className={`priority priority-${rawTip.priority.toLowerCase()}`}>
+                          {tip.priorityLabel || `${rawTip.priority} ${t(s, "priority_suffix")}`}
+                        </span>
+                        <div>
+                          <p className="tip-text">{tip.tip}</p>
+                          <p className="tip-reason">{t(s, "why_prefix")}: {tip.reason}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                   : <p className="good-msg">
-                      ✅ Your financial profile looks strong — keep it up!
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={16} color="#07C980" /> {t(s, "profile_strong_msg")}</span>
                     </p>
                 }
               </div>
 
               {/* Simulator */}
               <div className="card simulator-card">
-                <h2>What-If Financial Simulator</h2>
+                <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}><Sliders size={20} color="#065663" /> {t(s, "sim_title")}</h2>
                 <p className="sim-desc">
-                  See how improving a financial factor would change your
-                  approval chances instantly.
+                  {t(s, "sim_desc")}
                 </p>
                 <div className="sim-controls">
                   <div className="field">
-                    <label>Factor to Improve</label>
+                    <label>{t(s, "sim_factor")}</label>
                     <select value={simFeature} onChange={handleSimFeatureChange}>
-                      <option value="repayment_history">Repayment History</option>
-                      <option value="savings">Total Savings (RM)</option>
-                      <option value="monthly_debt">Monthly Debt (RM)</option>
-                      <option value="housing_status">Housing Status</option>
-                      <option value="loan_purpose">Loan Purpose</option>
+                      <option value="repayment_history">{t(s, "sim_feat_repayment")}</option>
+                      <option value="savings">{t(s, "sim_feat_savings")}</option>
+                      <option value="monthly_debt">{t(s, "sim_feat_debt")}</option>
+                      <option value="housing_status">{t(s, "sim_feat_housing")}</option>
+                      <option value="loan_purpose">{t(s, "sim_feat_purpose")}</option>
                     </select>
                   </div>
                   <div className="field">
-                    <label>Simulated New Value</label>
+                    <label>{t(s, "sim_value")}</label>
                     {simFeature === "repayment_history" && (
                       <select value={simValue}
                         onChange={e => setSimValue(e.target.value)}>
-                        <option value="excellent">Excellent — No missed payments</option>
-                        <option value="good">Good — Rarely missed</option>
-                        <option value="fair">Fair — Occasionally missed</option>
-                        <option value="poor">Poor — Frequently missed</option>
+                        <option value="excellent">{t(s, "opt_rep_excellent")}</option>
+                        <option value="good">{t(s, "opt_rep_good")}</option>
+                        <option value="fair">{t(s, "opt_rep_fair")}</option>
+                        <option value="poor">{t(s, "opt_rep_poor")}</option>
                       </select>
                     )}
                     {simFeature === "savings" && (
@@ -931,48 +933,48 @@ export default function App() {
                     {simFeature === "housing_status" && (
                       <select value={simValue}
                         onChange={e => setSimValue(e.target.value)}>
-                        <option value="own">Own Property</option>
-                        <option value="rent">Renting</option>
-                        <option value="free">Living Rent-Free</option>
+                        <option value="own">{t(s, "opt_housing_own")}</option>
+                        <option value="rent">{t(s, "opt_housing_rent")}</option>
+                        <option value="free">{t(s, "opt_housing_free")}</option>
                       </select>
                     )}
                     {simFeature === "loan_purpose" && (
                       <select value={simValue}
                         onChange={e => setSimValue(e.target.value)}>
-                        <option value="car">Purchase a Car</option>
-                        <option value="education">Education</option>
-                        <option value="business">Business</option>
-                        <option value="repairs">Home Repairs</option>
-                        <option value="furniture/equipment">Furniture / Equipment</option>
-                        <option value="vacation/others">Vacation / Others</option>
+                        <option value="car">{t(s, "purpose_car")}</option>
+                        <option value="education">{t(s, "purpose_education")}</option>
+                        <option value="business">{t(s, "purpose_business")}</option>
+                        <option value="repairs">{t(s, "purpose_repairs")}</option>
+                        <option value="furniture/equipment">{t(s, "purpose_furniture")}</option>
+                        <option value="vacation/others">{t(s, "purpose_vacation")}</option>
                       </select>
                     )}
                   </div>
                   <button className="btn-sim"
                     onClick={handleSimulate} disabled={loading}>
-                    {loading ? "..." : "▶ Simulate"}
+                    {loading ? "..." : <><Play size={14} /> {t(s, "sim_btn")}</>}
                   </button>
                 </div>
 
                 {simResult && (
                   <div className="sim-result">
                     <div className="sim-box current">
-                      <p>Current Probability</p>
+                      <p>{t(s, "sim_current")}</p>
                       <h3>{simResult.current_approval_prob}%</h3>
-                      <span>{simResult.current_decision}</span>
+                      <span>{simResult.current_decision === "Approved" ? t(s, "approved") : t(s, "rejected")}</span>
                     </div>
                     <div className="sim-arrow">→</div>
                     <div className="sim-box new">
-                      <p>After Change</p>
+                      <p>{t(s, "sim_after")}</p>
                       <h3>{simResult.new_approval_prob}%</h3>
-                      <span>{simResult.new_decision}</span>
+                      <span>{simResult.new_decision === "Approved" ? t(s, "approved") : t(s, "rejected")}</span>
                     </div>
                     <div className={`sim-box improvement
                       ${simResult.improvement >= 0 ? "positive" : "negative"}`}>
-                      <p>Net Change</p>
+                      <p>{t(s, "sim_change")}</p>
                       <h3>{simResult.improvement > 0 ? "+" : ""}{simResult.improvement}%</h3>
                       <span>{simResult.improvement >= 0
-                        ? "Improved ✅" : "Decreased ⚠️"}</span>
+                        ? t(s, "improved") : t(s, "decreased")}</span>
                     </div>
                   </div>
                 )}

@@ -22,13 +22,94 @@ export const STRINGS = {
     register_btn   : "Create Account",
     no_account     : "Don't have an account?",
     have_account   : "Already have an account?",
-    // Assessment
+
+    // Assessment Form & Navigation
     form_title     : "Loan Application Form",
     form_hint      : "Complete all sections for an accurate assessment.",
     tab_applicant  : "Applicant",
     tab_financial  : "Financial",
     tab_loan       : "Loan",
+    btn_next_financial: "Next: Financial Info →",
+    btn_back       : "← Back",
+    btn_next_loan  : "Next: Loan Details →",
     assess_btn     : "Assess My Credit",
+    btn_analysing  : "Analysing...",
+
+    // DTI Banner
+    dti_title      : "Debt-to-Income Ratio",
+    dti_healthy    : "Healthy",
+    dti_moderate   : "Moderate",
+    dti_high_risk  : "High Risk",
+    dti_total_debt : "Total monthly debt",
+    dti_income     : "Income",
+    dti_ideal      : "Ideal: below 30%",
+
+    // Tab 1: Applicant Information
+    sec_applicant  : "Applicant Information",
+    lbl_age        : "Age",
+    lbl_years      : "years",
+    lbl_gender     : "Gender",
+    opt_male       : "Male",
+    opt_female     : "Female",
+    lbl_emp_status : "Employment Status",
+    opt_employed   : "Employed",
+    opt_self_employed: "Self-Employed",
+    opt_unemployed : "Unemployed",
+    opt_retired    : "Retired",
+    lbl_emp_type   : "Employment Type",
+    opt_highly_skilled: "Highly Skilled / Management",
+    opt_skilled    : "Skilled Employee",
+    opt_unskilled  : "Unskilled",
+    lbl_emp_duration: "Employment Duration",
+    lbl_months     : "months",
+    lbl_monthly_income: "Monthly Net Income",
+    lbl_dependents : "Number of Dependents",
+    lbl_housing_status: "Housing Status",
+    opt_housing_own: "Own Property",
+    opt_housing_rent: "Renting",
+    opt_housing_free: "Living Rent-Free",
+    lbl_housing_payment: "Monthly Housing Payment",
+
+    // Tab 2: Financial Information
+    sec_financial  : "Financial & Credit Information",
+    lbl_monthly_debt: "Monthly Debt Commitments",
+    lbl_outstanding_financing: "Outstanding Financing",
+    lbl_cc_balance : "Credit Card Balance",
+    lbl_cc_limit   : "Credit Card Limit",
+    lbl_savings    : "Total Savings",
+    lbl_repayment_history: "Repayment History",
+    opt_rep_excellent: "Excellent — No missed payments",
+    opt_rep_good   : "Good — Rarely missed",
+    opt_rep_fair   : "Fair — Occasionally missed",
+    opt_rep_poor   : "Poor — Frequently missed",
+
+    // Tab 3: Loan Application
+    sec_loan       : "Loan Application",
+    lbl_loan_amount: "Loan Amount",
+    lbl_loan_duration: "Loan Duration",
+    lbl_loan_purpose: "Loan Purpose",
+    opt_purpose_car: "Purchase a Car",
+    opt_purpose_furniture: "Furniture / Home Equipment",
+    opt_purpose_education: "Education",
+    opt_purpose_business: "Business",
+    opt_purpose_repairs: "Home Repairs",
+    opt_purpose_vacation: "Vacation / Others",
+
+    // Loan Summary
+    sum_loan_amount: "Loan Amount",
+    sum_duration   : "Duration",
+    sum_est_monthly: "Est. Monthly Payment",
+    sum_lti        : "Loan-to-Income Ratio",
+
+    // Placeholders & Status
+    placeholder_text: "Complete the form and click Assess My Credit to receive your credit score, AI explanation, and personalised financial tips.",
+    loading_profile: "Analysing your profile, please wait...",
+    loading_hint   : "First request may take up to 60 seconds to wake the server.",
+    assessment_complete: "Assessment complete",
+    saved_to_cloud : "Saved to cloud",
+    btn_export_pdf : "Export PDF",
+    btn_exporting  : "Exporting...",
+
     // Results
     result_title   : "Credit Assessment Result",
     approved       : "APPROVED",
@@ -38,20 +119,30 @@ export const STRINGS = {
     low_risk       : "Low Risk",
     medium_risk    : "Medium Risk",
     high_risk      : "High Risk",
+    score_eligible_note: "Score above 50% = eligible for approval consideration.",
+
     // Explanation
     why_title      : "Why Was This Decision Made?",
     why_hint       : "Top factors our AI identified that influenced your result.",
     increases_risk : "Increases Risk",
     reduces_risk   : "Reduces Risk",
+    chart_title    : "Feature Impact Chart",
+    chart_legend_green: "Green = reduces risk",
+    chart_legend_red: "Red = increases risk",
+
     // Recommendations
     improve_title  : "How to Improve Your Score",
     improve_hint   : "Personalised steps based on your financial profile.",
     high_priority  : "High Priority",
     medium_priority: "Medium Priority",
     low_priority   : "Low Priority",
+    priority_suffix: "Priority",
+    why_prefix     : "Why",
+    profile_strong_msg: "Your financial profile looks strong — keep it up!",
+
     // Simulator
     sim_title      : "What-If Financial Simulator",
-    sim_desc       : "See how improving a financial factor changes your approval chances.",
+    sim_desc       : "See how improving a financial factor would change your approval chances instantly.",
     sim_factor     : "Factor to Improve",
     sim_value      : "Simulated New Value",
     sim_btn        : "Simulate",
@@ -60,6 +151,27 @@ export const STRINGS = {
     sim_change     : "Net Change",
     improved       : "Improved",
     decreased      : "Decreased",
+    sim_feat_repayment: "Repayment History",
+    sim_feat_savings: "Total Savings (RM)",
+    sim_feat_debt  : "Monthly Debt (RM)",
+    sim_feat_housing: "Housing Status",
+    sim_feat_purpose: "Loan Purpose",
+
+    // Validation Errors
+    err_age        : "Age must be between 18 and 80.",
+    err_income     : "Monthly income must be greater than 0.",
+    err_loan_amount: "Loan amount must be greater than 0.",
+    err_loan_duration: "Loan duration must be between 1 and 84 months.",
+    err_monthly_debt: "Monthly debt cannot be negative.",
+    err_savings    : "Savings cannot be negative.",
+    err_cc_balance : "Credit card balance cannot be negative.",
+    err_housing_payment: "Housing payment cannot be negative.",
+    err_dti_high   : "Your debt-to-income ratio is extremely high. Please review your figures.",
+    err_fix_errors : "Please fix the errors above before submitting.",
+    err_server_conn: "Unable to connect — make sure the Flask server is running.",
+    err_sim_failed : "Simulation failed — make sure Flask is running.",
+    err_pdf_failed : "PDF export failed. Please try again.",
+
     // History
     history_title  : "My Assessment History",
     no_history     : "No past assessments found.",
@@ -116,13 +228,94 @@ export const STRINGS = {
     register_btn   : "Cipta Akaun",
     no_account     : "Tiada akaun?",
     have_account   : "Sudah ada akaun?",
-    // Assessment
+
+    // Assessment Form & Navigation
     form_title     : "Borang Permohonan Pinjaman",
     form_hint      : "Lengkapkan semua bahagian untuk penilaian yang tepat.",
     tab_applicant  : "Pemohon",
     tab_financial  : "Kewangan",
     tab_loan       : "Pinjaman",
+    btn_next_financial: "Seterusnya: Maklumat Kewangan →",
+    btn_back       : "← Kembali",
+    btn_next_loan  : "Seterusnya: Butiran Pinjaman →",
     assess_btn     : "Nilai Kredit Saya",
+    btn_analysing  : "Sedang Menganalisis...",
+
+    // DTI Banner
+    dti_title      : "Nisbah Hutang-kepada-Pendapatan",
+    dti_healthy    : "Sihat",
+    dti_moderate   : "Sederhana",
+    dti_high_risk  : "Risiko Tinggi",
+    dti_total_debt : "Jumlah hutang bulanan",
+    dti_income     : "Pendapatan",
+    dti_ideal      : "Ideal: bawah 30%",
+
+    // Tab 1: Applicant Information
+    sec_applicant  : "Maklumat Pemohon",
+    lbl_age        : "Umur",
+    lbl_years      : "tahun",
+    lbl_gender     : "Jantina",
+    opt_male       : "Lelaki",
+    opt_female     : "Perempuan",
+    lbl_emp_status : "Status Pekerjaan",
+    opt_employed   : "Bekerja",
+    opt_self_employed: "Bekerja Sendiri",
+    opt_unemployed : "Tidak Bekerja",
+    opt_retired    : "Bersara",
+    lbl_emp_type   : "Jenis Pekerjaan",
+    opt_highly_skilled: "Berkemahiran Tinggi / Pengurusan",
+    opt_skilled    : "Pekerja Mahir",
+    opt_unskilled  : "Tidak Mahir",
+    lbl_emp_duration: "Tempoh Pekerjaan",
+    lbl_months     : "bulan",
+    lbl_monthly_income: "Pendapatan Bersih Bulanan",
+    lbl_dependents : "Bilangan Tanggungan",
+    lbl_housing_status: "Status Kediaman",
+    opt_housing_own: "Milik Sendiri",
+    opt_housing_rent: "Menyewa",
+    opt_housing_free: "Tinggal Percuma",
+    lbl_housing_payment: "Bayaran Kediaman Bulanan",
+
+    // Tab 2: Financial Information
+    sec_financial  : "Maklumat Kewangan & Kredit",
+    lbl_monthly_debt: "Komitmen Hutang Bulanan",
+    lbl_outstanding_financing: "Pembiayaan Belum Selesai",
+    lbl_cc_balance : "Baki Kad Kredit",
+    lbl_cc_limit   : "Had Kad Kredit",
+    lbl_savings    : "Jumlah Simpanan",
+    lbl_repayment_history: "Sejarah Pembayaran Balik",
+    opt_rep_excellent: "Cemerlang — Tiada bayaran tertunggak",
+    opt_rep_good   : "Baik — Jarang tertunggak",
+    opt_rep_fair   : "Sederhana — Kadang-kadang tertunggak",
+    opt_rep_poor   : "Lemah — Kerap tertunggak",
+
+    // Tab 3: Loan Application
+    sec_loan       : "Permohonan Pinjaman",
+    lbl_loan_amount: "Jumlah Pinjaman",
+    lbl_loan_duration: "Tempoh Pinjaman",
+    lbl_loan_purpose: "Tujuan Pinjaman",
+    purpose_car    : "Beli Kereta",
+    purpose_furniture: "Perabot / Kelengkapan Rumah",
+    purpose_education: "Pendidikan",
+    purpose_business: "Perniagaan",
+    purpose_repairs: "Pembaikan Rumah",
+    purpose_vacation: "Percutian / Lain-lain",
+
+    // Loan Summary
+    sum_loan_amount: "Jumlah Pinjaman",
+    sum_duration   : "Tempoh",
+    sum_est_monthly: "Anggaran Bayaran Bulanan",
+    sum_lti        : "Nisbah Pinjaman-kepada-Pendapatan",
+
+    // Placeholders & Status
+    placeholder_text: "Lengkapkan borang dan klik Nilai Kredit Saya untuk menerima skor kredit, penjelasan AI, dan panduan kewangan peribadi.",
+    loading_profile: "Sedang menganalisis profil anda, sila tunggu...",
+    loading_hint   : "Permintaan pertama mungkin mengambil masa sehingga 60 saat untuk mengaktifkan pelayan.",
+    assessment_complete: "Penilaian selesai",
+    saved_to_cloud : "Disimpan ke awan",
+    btn_export_pdf : "Eksport PDF",
+    btn_exporting  : "Mengeksport...",
+
     // Results
     result_title   : "Keputusan Penilaian Kredit",
     approved       : "DILULUSKAN",
@@ -132,20 +325,30 @@ export const STRINGS = {
     low_risk       : "Risiko Rendah",
     medium_risk    : "Risiko Sederhana",
     high_risk      : "Risiko Tinggi",
+    score_eligible_note: "Skor melebihi 50% = layak untuk pertimbangan kelulusan.",
+
     // Explanation
     why_title      : "Mengapa Keputusan Ini Dibuat?",
-    why_hint       : "Faktor utama yang dikenal pasti oleh AI yang mempengaruhi keputusan anda.",
+    why_hint       : "Faktor utama yang dikenal pasti oleh AI kami yang mempengaruhi keputusan anda.",
     increases_risk : "Meningkatkan Risiko",
     reduces_risk   : "Mengurangkan Risiko",
+    chart_title    : "Carta Impak Ciri",
+    chart_legend_green: "Hijau = mengurangkan risiko",
+    chart_legend_red: "Merah = meningkatkan risiko",
+
     // Recommendations
     improve_title  : "Cara Meningkatkan Skor Anda",
     improve_hint   : "Langkah peribadi berdasarkan profil kewangan anda.",
     high_priority  : "Keutamaan Tinggi",
     medium_priority: "Keutamaan Sederhana",
     low_priority   : "Keutamaan Rendah",
+    priority_suffix: "Keutamaan",
+    why_prefix     : "Sebab",
+    profile_strong_msg: "Profil kewangan anda kelihatan kukuh — teruskan!",
+
     // Simulator
     sim_title      : "Simulator Kewangan Bagaimana-Jika",
-    sim_desc       : "Lihat bagaimana penambahbaikan faktor kewangan mengubah peluang kelulusan anda.",
+    sim_desc       : "Lihat bagaimana penambahbaikan faktor kewangan akan mengubah peluang kelulusan anda serta-merta.",
     sim_factor     : "Faktor untuk Ditambahbaik",
     sim_value      : "Nilai Simulasi Baharu",
     sim_btn        : "Simulasi",
@@ -154,6 +357,27 @@ export const STRINGS = {
     sim_change     : "Perubahan Bersih",
     improved       : "Bertambah Baik",
     decreased      : "Berkurangan",
+    sim_feat_repayment: "Sejarah Pembayaran Balik",
+    sim_feat_savings: "Jumlah Simpanan (RM)",
+    sim_feat_debt  : "Hutang Bulanan (RM)",
+    sim_feat_housing: "Status Kediaman",
+    sim_feat_purpose: "Tujuan Pinjaman",
+
+    // Validation Errors
+    err_age        : "Umur mestilah antara 18 dan 80 tahun.",
+    err_income     : "Pendapatan bulanan mestilah lebih daripada 0.",
+    err_loan_amount: "Jumlah pinjaman mestilah lebih daripada 0.",
+    err_loan_duration: "Tempoh pinjaman mestilah antara 1 dan 84 bulan.",
+    err_monthly_debt: "Hutang bulanan tidak boleh bernilai negatif.",
+    err_savings    : "Simpanan tidak boleh bernilai negatif.",
+    err_cc_balance : "Baki kad kredit tidak boleh bernilai negatif.",
+    err_housing_payment: "Bayaran kediaman tidak boleh bernilai negatif.",
+    err_dti_high   : "Nisbah hutang-kepada-pendapatan anda sangat tinggi. Sila semak semula angka anda.",
+    err_fix_errors : "Sila betulkan ralat di atas sebelum menghantar.",
+    err_server_conn: "Tidak dapat menyambung — pastikan pelayan Flask sedang berjalan.",
+    err_sim_failed : "Simulasi gagal — pastikan pelayan Flask sedang berjalan.",
+    err_pdf_failed : "Eksport PDF gagal. Sila cuba lagi.",
+
     // History
     history_title  : "Sejarah Penilaian Saya",
     no_history     : "Tiada penilaian lepas dijumpai.",
@@ -189,4 +413,4 @@ export const STRINGS = {
   }
 };
 
-export const t = (strings, key) => strings[key] || key;
+export const t = (strings, key) => (strings && strings[key]) ? strings[key] : key;
