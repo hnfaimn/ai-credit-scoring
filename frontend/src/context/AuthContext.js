@@ -1,10 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth, getUserProfile } from "../firebase";
+import { auth, db, getUserProfile } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+export const ADMIN_EMAILS = [
+  "hanifaiman390@gmail.com",
+  "hanifdraco39@gmail.com"
+];
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser]       = useState(null);
@@ -16,9 +22,48 @@ export const AuthProvider = ({ children }) => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
-        const prof = await getUserProfile(firebaseUser.uid);
-        setProfile(prof);
-        if (prof?.language) setLang(prof.language);
+        const emailLower = (firebaseUser.email || "").toLowerCase();
+        const isMasterAdmin = ADMIN_EMAILS.some(e => e.toLowerCase() === emailLower);
+
+        try {
+          let prof = await getUserProfile(firebaseUser.uid);
+
+          if (!prof) {
+            prof = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              name: firebaseUser.displayName || (isMasterAdmin ? "Admin" : "User"),
+              role: isMasterAdmin ? "admin" : "applicant",
+              language: "en"
+            };
+            try {
+              await setDoc(doc(db, "users", firebaseUser.uid), prof, { merge: true });
+            } catch (saveErr) {
+              console.warn("Could not persist initial profile:", saveErr);
+            }
+          } else if (isMasterAdmin && prof.role !== "admin") {
+            prof = { ...prof, role: "admin" };
+            try {
+              await setDoc(doc(db, "users", firebaseUser.uid), { role: "admin" }, { merge: true });
+            } catch (saveErr) {
+              console.warn("Could not update admin role in Firestore:", saveErr);
+            }
+          }
+
+          setProfile(prof);
+          if (prof?.language) setLang(prof.language);
+        } catch (err) {
+          console.error("Error loading user profile:", err);
+          if (isMasterAdmin) {
+            setProfile({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              name: firebaseUser.displayName || "Admin",
+              role: "admin",
+              language: "en"
+            });
+          }
+        }
       } else {
         setUser(null);
         setProfile(null);
@@ -29,15 +74,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const toggleLang = () => {
-    setLang(prev => prev === "en" ? "ms" : "en");
+    setLang(prev => (prev === "en" ? "ms" : "en"));
   };
+
+  const emailLower = (user?.email || "").toLowerCase();
+  const isMasterAdmin = ADMIN_EMAILS.some(e => e.toLowerCase() === emailLower);
+  const isAdmin = profile?.role === "admin" || isMasterAdmin;
 
   return (
     <AuthContext.Provider value={{
       user, profile, loading, lang, toggleLang,
-      isAdmin        : profile?.role === "admin",
+      isAdmin,
       isLoanOfficer  : profile?.role === "loan_officer",
-      isApplicant    : profile?.role === "applicant",
+      isApplicant    : profile?.role === "applicant" && !isAdmin,
     }}>
       {!loading && children}
     </AuthContext.Provider>

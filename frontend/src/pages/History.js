@@ -35,7 +35,7 @@ export default function History() {
   useEffect(() => {
     const load = async () => {
       if (user) {
-        const data = await getUserAssessments(user.uid);
+        const data = await getUserAssessments(user.uid, user.email);
         setHistory(data);
       }
       setLoading(false);

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { STRINGS, t } from "../lang/strings";
 import { Mail, Shield, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export default function Profile() {
-  const { user, profile, lang } = useAuth();
-  const s                       = STRINGS[lang];
+  const { user, profile, lang, isAdmin } = useAuth();
+  const s                                = STRINGS[lang];
 
   const [form, setForm]       = useState({
     name    : profile?.name     || "",
@@ -22,12 +22,12 @@ export default function Profile() {
   const handleSave = async () => {
     setSaving(true); setSuccess(""); setError("");
     try {
-      await updateDoc(doc(db, "users", user.uid), {
+      await setDoc(doc(db, "users", user.uid), {
         name   : form.name,
         phone  : form.phone,
         ic     : form.ic,
         address: form.address,
-      });
+      }, { merge: true });
       setSuccess(lang==="en"
         ? "Profile updated successfully!"
         : "Profil berjaya dikemaskini!");
@@ -62,7 +62,7 @@ export default function Profile() {
             <h3 className="profile-name">{profile?.name || "—"}</h3>
             <p className="profile-email">{user?.email}</p>
             <span className="profile-role-badge">
-              {profile?.role || "applicant"}
+              {isAdmin ? "admin" : (profile?.role || "applicant")}
             </span>
           </div>
 
@@ -80,7 +80,7 @@ export default function Profile() {
                 <Shield size={15} /> {lang==="en" ? "Role" : "Peranan"}
               </span>
               <span style={{ textTransform:"capitalize" }}>
-                {profile?.role || "applicant"}
+                {isAdmin ? "admin" : (profile?.role || "applicant")}
               </span>
             </div>
             <div className="profile-info-row">

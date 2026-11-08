@@ -94,6 +94,16 @@ export default function Navbar() {
               <User size={15} /> {profile?.name || user.email}
             </span>
             <div className={`nav-dropdown ${userDropdownOpen ? "show" : ""}`}>
+              {isAdmin && (
+                <Link 
+                  to="/admin" 
+                  className="dropdown-item" 
+                  onClick={() => setUserDropdownOpen(false)}
+                  style={{ display: "flex", alignItems: "center", gap: 8, color: "#065663", fontWeight: 600 }}
+                >
+                  <ShieldCheck size={15} color="#065663" /> {t(s,"nav_admin")}
+                </Link>
+              )}
               <Link 
                 to="/dashboard/profile" 
                 className="dropdown-item" 
@@ -135,9 +145,20 @@ export default function Navbar() {
               <div>
                 <p className="mini-name">{profile?.name || "User"}</p>
                 <p className="mini-email">{user.email}</p>
+                {isAdmin && (
+                  <span style={{ fontSize: 11, background: "#e8f8f2", color: "#07C980", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
+                    Admin
+                  </span>
+                )}
               </div>
             </div>
             <div className="mini-divider" />
+            {isAdmin && (
+              <Link to="/admin" className="mini-item"
+                onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 8, color: "#065663", fontWeight: 600 }}>
+                <ShieldCheck size={16} color="#065663" /> {t(s,"nav_admin")}
+              </Link>
+            )}
             <button className="mini-item" onClick={() => { toggleLang(); setMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Globe size={16} /> {lang === "en" ? "Switch to BM" : "Switch to EN"}
             </button>
