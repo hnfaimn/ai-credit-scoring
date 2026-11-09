@@ -156,7 +156,11 @@ export const getUserAssessments = async (uid, email = null) => {
     }
     if (subSnap && !subSnap.empty) {
       subSnap.docs.forEach(d => {
-        resultsMap.set(d.id, { id: d.id, ...d.data() });
+        const data = d.data();
+
+        const assessmentId = data.id || d.id;
+
+        resultsMap.set(assessmentId, { ...data,id: assessmentId });
       });
     }
   } catch (err) {

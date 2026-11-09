@@ -669,12 +669,13 @@ export default function Assess() {
                   <label>{t(s, "lbl_loan_purpose")}</label>
                   <select name="loan_purpose" value={form.loan_purpose}
                     onChange={handleChange}>
-                    <option value="car">{t(s, "purpose_car")}</option>
-                    <option value="furniture/equipment">{t(s, "purpose_furniture")}</option>
-                    <option value="education">{t(s, "purpose_education")}</option>
-                    <option value="business">{t(s, "purpose_business")}</option>
-                    <option value="repairs">{t(s, "purpose_repairs")}</option>
-                    <option value="vacation/others">{t(s, "purpose_vacation")}</option>
+                    <option value="car">{t(s, "Car")}</option>
+                    <option value="furniture/equipment">{t(s, "Furniture")}</option>
+                    <option value="education">{t(s, "Education")}</option>
+                    <option value="business">{t(s, "Business")}</option>
+                    <option value="repairs">{t(s, "Repairs")}</option>
+                    <option value="vacation/others">{t(s, "Vacation")}</option>
+                    <option value="vacation/others">{t(s, "Others")}</option>
                   </select>
                 </div>
                 <div className="field full">
