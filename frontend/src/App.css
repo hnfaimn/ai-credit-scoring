@@ -1916,3 +1916,10 @@ p, span, input, select, td, th, li {
     padding: 0 8px;
   }
 }
+
+/* Responsive chart container */
+.chart-container {
+  width: 100%;
+  min-width: 0;
+  height: 220px;
+}

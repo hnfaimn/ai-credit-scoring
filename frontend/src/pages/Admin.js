@@ -241,37 +241,41 @@ export default function Admin() {
             {/* Decision pie */}
             <div className="card">
               <h2>{lang==="en" ? "Approval vs Rejection" : "Kelulusan vs Penolakan"}</h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={decisionPie} dataKey="value"
-                    nameKey="name" cx="50%" cy="50%"
-                    outerRadius={75}
-                    label={({name,value}) => `${name}: ${value}`}>
-                    {decisionPie.map((e,i) => (
-                      <Cell key={i} fill={e.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie data={decisionPie} dataKey="value"
+                      nameKey="name" cx="50%" cy="50%"
+                      outerRadius={75}
+                      label={({name,value}) => `${name}: ${value}`}>
+                      {decisionPie.map((e,i) => (
+                        <Cell key={i} fill={e.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {/* Risk distribution */}
             <div className="card">
               <h2>{t(s,"risk_dist")}</h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={riskDist} dataKey="value"
-                    nameKey="name" cx="50%" cy="50%"
-                    outerRadius={75}
-                    label={({name,value}) => `${name}: ${value}`}>
-                    {riskDist.map((e,i) => (
-                      <Cell key={i} fill={e.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie data={riskDist} dataKey="value"
+                      nameKey="name" cx="50%" cy="50%"
+                      outerRadius={75}
+                      label={({name,value}) => `${name}: ${value}`}>
+                      {riskDist.map((e,i) => (
+                        <Cell key={i} fill={e.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
 

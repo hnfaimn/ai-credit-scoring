@@ -259,19 +259,21 @@ export default function Finance() {
               {/* Pie chart */}
               <div className="card">
                 <h2>{lang==="en" ? "Spending by Category" : "Perbelanjaan Mengikut Kategori"}</h2>
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie data={categoryData} dataKey="value"
-                      nameKey="name" cx="50%" cy="50%"
-                      outerRadius={80} label={({name, percent}) =>
-                        `${name} ${(percent*100).toFixed(0)}%`}>
-                      {categoryData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={v => [`RM ${v.toLocaleString()}`, ""]} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie data={categoryData} dataKey="value"
+                        nameKey="name" cx="50%" cy="50%"
+                        outerRadius={80} label={({name, percent}) =>
+                          `${name} ${(percent*100).toFixed(0)}%`}>
+                        {categoryData.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={v => [`RM ${v.toLocaleString()}`, ""]} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
 
               {/* Bar chart */}
