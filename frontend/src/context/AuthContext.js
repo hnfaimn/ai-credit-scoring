@@ -9,7 +9,9 @@ export const useAuth = () => useContext(AuthContext);
 
 // ONLY the designated master administrator account
 export const ADMIN_EMAILS = [
-  "hanifaiman390@gmail.com"
+  "hanifaiman390@gmail.com",
+  "rohanaadmin@gmail.com"
+  
 ];
 
 export const AuthProvider = ({ children }) => {
