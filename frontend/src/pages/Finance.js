@@ -443,13 +443,34 @@ export default function Finance() {
                         {exp.note && <p className="exp-note">{exp.note}</p>}
                       </div>
                     </div>
-                    <div className="exp-right">
-                      <p className="exp-amount">RM {Number(exp.amount).toLocaleString()}</p>
-                      <p className="exp-date">
-                        {exp.date
-                          ? new Date(exp.date).toLocaleDateString()
-                          : "—"}
-                      </p>
+                    <div className="exp-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div>
+                        <p className="exp-amount">RM {Number(exp.amount).toLocaleString()}</p>
+                        <p className="exp-date">
+                          {exp.date
+                            ? new Date(exp.date).toISOString().slice(0, 10)
+                            : "—"}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleEditClick(exp)}
+                        style={{
+                          background: "#e8faf4",
+                          border: "1px solid #07C980",
+                          color: "#065663",
+                          borderRadius: 6,
+                          padding: "6px 10px",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          fontSize: 12,
+                          fontWeight: 600
+                        }}
+                        title={lang==="en" ? "Edit expense" : "Kemaskini perbelanjaan"}
+                      >
+                        <Edit2 size={13} /> {lang==="en" ? "Edit" : "Ubah"}
+                      </button>
                     </div>
                   </div>
                 ))}
