@@ -22,6 +22,13 @@ export const STRINGS = {
     register_btn   : "Create Account",
     no_account     : "Don't have an account?",
     have_account   : "Already have an account?",
+    forgot_password   : "Forgot Password?",
+    forgot_back       : "Back to Login",
+    forgot_title      : "Reset Password",
+    forgot_desc       : "Enter your email and we'll send you a reset link.",
+    forgot_btn        : "Send Reset Link",
+    forgot_sent       : "Reset email sent! Check your inbox.",
+    forgot_email_lbl  : "Email Address",
 
     // Assessment Form & Navigation
     form_title     : "Loan Application Form",
@@ -228,6 +235,13 @@ export const STRINGS = {
     register_btn   : "Cipta Akaun",
     no_account     : "Tiada akaun?",
     have_account   : "Sudah ada akaun?",
+    forgot_password   : "Lupa Kata Laluan?",
+    forgot_back       : "Kembali ke Log Masuk",
+    forgot_title      : "Tetapkan Semula Kata Laluan",
+    forgot_desc       : "Masukkan e-mel anda dan kami akan hantar pautan tetapan semula.",
+    forgot_btn        : "Hantar Pautan Tetapan Semula",
+    forgot_sent       : "E-mel tetapan semula dihantar! Semak peti masuk anda.",
+    forgot_email_lbl  : "Alamat E-mel",
 
     // Assessment Form & Navigation
     form_title     : "Borang Permohonan Pinjaman",
