@@ -48,7 +48,7 @@ export default function Trajectory() {
     score     : rec.credit_score,
     decision  : rec.decision,
     date      : rec.created_at
-      ? new Date(rec.created_at).toLocaleDateString()
+      ? new Date(rec.created_at).toISOString().slice(0, 10)
       : "—",
     risk      : rec.risk_class,
   }));

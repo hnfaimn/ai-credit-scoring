@@ -69,7 +69,7 @@ export default function History() {
       name  : `#${i + 1}`,
       score : rec.credit_score,
       date  : rec.created_at
-        ? new Date(rec.created_at).toLocaleDateString()
+        ? new Date(rec.created_at).toISOString().slice(0, 10)
         : "—",
     }));
 

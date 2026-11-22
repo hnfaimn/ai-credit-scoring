@@ -142,13 +142,25 @@ export default function Admin() {
     a.click();
   };
 
-  // Filter assessments
-  const filtered = assessments.filter(a =>
-    !search ||
-    a.decision?.toLowerCase().includes(search.toLowerCase()) ||
-    a.risk_class?.toLowerCase().includes(search.toLowerCase()) ||
-    a.loan_purpose?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter assessments — supports age, gender, loan amount (with or without commas)
+  const cleanSearch = search.trim().toLowerCase();
+  const rawSearchNumber = search.replace(/,/g, "").trim();
+
+  const filtered = assessments.filter(a => {
+    if (!cleanSearch) return true;
+    const loanRaw       = String(a.loan_amount || "");
+    const loanFormatted = (a.loan_amount?.toLocaleString() || "").toLowerCase();
+    return (
+      a.decision?.toLowerCase().includes(cleanSearch)    ||
+      a.risk_class?.toLowerCase().includes(cleanSearch)  ||
+      a.loan_purpose?.toLowerCase().includes(cleanSearch)||
+      a.gender?.toLowerCase().includes(cleanSearch)      ||
+      String(a.age || "").includes(cleanSearch)          ||
+      String(a.credit_score || "").includes(cleanSearch) ||
+      loanRaw.includes(rawSearchNumber)                  ||
+      loanFormatted.includes(cleanSearch)
+    );
+  });
 
   const Tab = ({ id, label, icon: Icon }) => (
     <button
@@ -580,7 +592,7 @@ export default function Admin() {
                 {filtered.map((a, i) => (
                   <tr key={i}>
                     <td>{a.created_at
-                      ? new Date(a.created_at).toLocaleDateString()
+                      ? new Date(a.created_at).toISOString().slice(0, 10)
                       : "—"}</td>
                     <td>{a.age}</td>
                     <td>{a.gender}</td>
