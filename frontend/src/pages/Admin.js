@@ -128,7 +128,7 @@ export default function Admin() {
     const headers = ["Date","Name","Age","Gender","Employment",
       "Loan Amount","Duration","Purpose","Credit Score","Decision","Risk Class"];
     const rows = assessments.map(a => [
-      a.created_at ? new Date(a.created_at).toLocaleDateString() : "—",
+      a.created_at ? new Date(a.created_at).toISOString().slice(0, 10) : "",
       a.uid || "—", a.age, a.gender, a.employment_status,
       a.loan_amount, a.loan_duration, a.loan_purpose,
       a.credit_score, a.decision, a.risk_class
