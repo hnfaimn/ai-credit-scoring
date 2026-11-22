@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { saveExpense, getUserExpenses, saveSavingsGoal, getSavingsGoal } from "../firebase";
+import { saveExpense, updateExpense, getUserExpenses, saveSavingsGoal, getSavingsGoal } from "../firebase";
 import { STRINGS, t } from "../lang/strings";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend
 } from "recharts";
 import {
   DollarSign,
@@ -19,7 +19,8 @@ import {
   Calendar,
   Home,
   Zap,
-  Loader2
+  Loader2,
+  Edit2
 } from "lucide-react";
 
 const CATEGORIES = {
@@ -48,6 +49,32 @@ export default function Finance() {
     date    : new Date().toISOString().split("T")[0],
     note    : ""
   });
+
+    const [editingId, setEditingId]    = useState(null);
+
+  const handleEditClick = (exp) => {
+    setEditingId(exp.id);
+    setExpForm({
+      category: exp.category,
+      amount  : exp.amount,
+      date    : exp.date ? new Date(exp.date).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+      note    : exp.note || ""
+    });
+    setShowExpForm(true);
+    // Scroll to form
+    window.scrollTo({ top: 300, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setExpForm({
+      category: CATEGORIES[lang][0],
+      amount  : "",
+      date    : new Date().toISOString().slice(0, 10),
+      note    : ""
+    });
+    setShowExpForm(false);
+  };
 
   // Goal form
   const [goalForm, setGoalForm] = useState({
@@ -108,22 +135,26 @@ export default function Finance() {
     .map(([month, total]) => ({ month, total }));
 
   // Save expense
+  // Save or Update expense
   const handleSaveExpense = async () => {
     if (!expForm.amount || !expForm.date) return;
-    const saved = await saveExpense(user.uid, {
-      ...expForm,
-      amount: Number(expForm.amount)
-    });
+    let saved = false;
+    if (editingId) {
+      saved = await updateExpense(user.uid, editingId, {
+        ...expForm,
+        amount: Number(expForm.amount)
+      });
+    } else {
+      saved = await saveExpense(user.uid, {
+        ...expForm,
+        amount: Number(expForm.amount)
+      });
+    }
+
     if (saved) {
       const updated = await getUserExpenses(user.uid);
       setExpenses(updated);
-      setExpForm({
-        category: CATEGORIES[lang][0],
-        amount  : "",
-        date    : new Date().toISOString().split("T")[0],
-        note    : ""
-      });
-      setShowExpForm(false);
+      handleCancelEdit();
     }
   };
 
@@ -276,10 +307,10 @@ export default function Finance() {
                 </div>
               </div>
 
-              {/* Bar chart */}
+              {/* Bar chart with Legend & Guidance */}
               <div className="card">
-                <h2>{lang==="en" ? "Monthly Spending" : "Perbelanjaan Bulanan"}</h2>
-                <ResponsiveContainer width="100%" height={220}>
+                <h2>{lang==="en" ? "Monthly Spending Trend" : "Trend Perbelanjaan Bulanan"}</h2>
+                <ResponsiveContainer width="100%" height={230}>
                   <BarChart data={monthlyChart}
                     margin={{ left:0, right:10, top:10, bottom:0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -287,9 +318,22 @@ export default function Finance() {
                     <YAxis tick={{ fontSize:10 }}
                       tickFormatter={v => `RM${v}`} />
                     <Tooltip formatter={v => [`RM ${v.toLocaleString()}`, ""]} />
-                    <Bar dataKey="total" fill="#07C980" radius={4} />
+                    <Legend 
+                      verticalAlign="top" 
+                      height={32} 
+                      formatter={() => (lang==="en" ? "Total Spending (RM)" : "Jumlah Perbelanjaan (RM)")} 
+                    />
+                    <Bar dataKey="total" fill="#07C980" radius={4} name="total" />
                   </BarChart>
                 </ResponsiveContainer>
+
+                {/* Trend Guidance Note */}
+                <div style={{ marginTop: 12, padding: "10px 14px", background: "#f0faf7", borderRadius: 8, fontSize: 12, color: "#065663", lineHeight: 1.5, borderLeft: "3px solid #07C980" }}>
+                  <strong>💡 {lang==="en" ? "Trend Guidance:" : "Panduan Trend:"}</strong>{" "}
+                  {lang==="en"
+                    ? "Consistent or decreasing monthly spending reduces your Debt-to-Income (DTI) ratio, preserving healthy disposable income for credit approvals."
+                    : "Perbelanjaan bulanan yang konsisten atau menurun mengurangkan nisbah DTI anda, mengekalkan baki pendapatan yang sihat untuk kelulusan kredit."}
+                </div>
               </div>
             </div>
           )}
@@ -318,9 +362,22 @@ export default function Finance() {
               </button>
             </div>
 
-            {/* Add expense form */}
+            {/* Add / Edit expense form */}
             {showExpForm && (
-              <div className="expense-form">
+              <div className="expense-form" style={{ background: editingId ? "#f4fbf8" : undefined, border: editingId ? "1.5px solid #07C980" : undefined, padding: 16, borderRadius: 8, marginBottom: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <h3 style={{ fontSize: 14, color: "#065663", fontWeight: 700 }}>
+                    {editingId 
+                      ? (lang==="en" ? "✏️ Edit Expense Record" : "✏️ Kemaskini Rekod Perbelanjaan")
+                      : (lang==="en" ? "➕ Add New Expense" : "➕ Tambah Perbelanjaan Baharu")}
+                  </h3>
+                  {editingId && (
+                    <button onClick={handleCancelEdit} style={{ background: "none", border: "none", color: "#888", cursor: "pointer", fontSize: 12 }}>
+                      {lang==="en" ? "Cancel" : "Batal"} ✕
+                    </button>
+                  )}
+                </div>
+
                 <div className="form-grid">
                   <div className="field">
                     <label>{t(s,"fin_category")}</label>
@@ -349,10 +406,22 @@ export default function Finance() {
                       onChange={e => setExpForm(f => ({...f, note:e.target.value}))} />
                   </div>
                 </div>
-                <button className="btn-primary"
-                  style={{ marginTop:12 }} onClick={handleSaveExpense}>
-                  {t(s,"fin_save")}
-                </button>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+                  <button className="btn-primary" onClick={handleSaveExpense}>
+                    {editingId 
+                      ? (lang==="en" ? "Update Expense" : "Kemaskini Perbelanjaan")
+                      : t(s,"fin_save")}
+                  </button>
+                  {editingId && (
+                    <button 
+                      onClick={handleCancelEdit} 
+                      style={{ padding: "10px 16px", background: "#f0f0f0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "#555" }}
+                    >
+                      {lang==="en" ? "Cancel" : "Batal"}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -385,6 +454,7 @@ export default function Finance() {
                   </div>
                 ))}
               </div>
+              
             )}
           </div>
         </div>

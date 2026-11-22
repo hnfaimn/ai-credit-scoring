@@ -255,6 +255,20 @@ export const saveExpense = async (uid, expense) => {
   }
 };
 
+export const updateExpense = async (uid, expenseId, expense) => {
+  try {
+    await setDoc(doc(db, "users", uid, "expenses", expenseId), {
+      ...expense,
+      updated_at: serverTimestamp(),
+      updated_at_str: new Date().toISOString(),
+    }, { merge: true });
+    return true;
+  } catch (err) {
+    console.error("updateExpense error:", err);
+    return false;
+  }
+};
+
 export const getUserExpenses = async (uid) => {
   try {
     let snap;
