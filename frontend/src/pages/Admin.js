@@ -5,7 +5,7 @@ import { STRINGS, t } from "../lang/strings";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  LineChart, Line
+  LineChart, Line, Legend
 } from "recharts";
 import {
   BarChart3,
