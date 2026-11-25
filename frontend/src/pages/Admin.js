@@ -526,23 +526,23 @@ export default function Admin() {
                 };
               }).filter(g => g.count > 0);
               return (
-                <ResponsiveContainer width="100%" height={220}>
+                                <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={ageData}
                     margin={{ left:0, right:20, top:10, bottom:0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="age" tick={{ fontSize:12 }} />
                     <YAxis domain={[0,100]} tickFormatter={v=>`${v}%`}
                       tick={{ fontSize:11 }} />
-                    <Tooltip formatter={(v,n) => [
-                      `${v}%`,
-                      n==="appRate"
-                        ? (lang==="en" ? "Approval Rate" : "Kadar Kelulusan")
-                        : (lang==="en" ? "Avg Score" : "Skor Purata")
-                    ]} />
-                    <Bar dataKey="appRate"  fill="#07C980" radius={4}
+                    <Tooltip formatter={(value, name) => [`${value}%`, name]} />
+                    <Legend 
+                      verticalAlign="top" 
+                      height={36} 
+                      formatter={(value) => <span style={{ color: "#065663", fontSize: 12, fontWeight: 600 }}>{value}</span>}
+                    />
+                    <Bar dataKey="appRate" fill="#07C980" radius={4}
                       name={lang==="en" ? "Approval Rate" : "Kadar Kelulusan"} />
                     <Bar dataKey="avgScore" fill="#065663" radius={4}
-                      name={lang==="en" ? "Avg Score" : "Skor Purata"} />
+                      name={lang==="en" ? "Average Score" : "Skor Purata"} />
                   </BarChart>
                 </ResponsiveContainer>
               );
